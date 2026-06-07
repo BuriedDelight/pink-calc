@@ -61,6 +61,15 @@ function deleteLast() {
     if (display.innerText === '') display.innerText = '0';
 }
 
+function appendValue(value) {
+    if (errorState) clearDisplay();
+    if (display.innerText === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
+        display.innerText = value;
+    } else {
+        display.innerText += value;
+    }
+}
+
 function scrollToBottom() {
     historyDiv.scrollTop = historyDiv.scrollHeight;
 }
