@@ -49,7 +49,6 @@ function toggleModal() {
 // 5. Очистка
 function clearAll() {
     clearDisplay();
-    historyDiv.innerHTML = '';
 }
 
 function clearDisplay() {
@@ -127,3 +126,55 @@ function calculate() {
         setTimeout(clearDisplay, 1500);
     }
 }
+
+const modal = document.querySelector('.modal-overlay');
+const modalBody = document.querySelector('.modal-body'); // Контейнер с историей
+
+let startY = 0;
+let currentY = 0;
+let isDragging = false;
+
+// Начало касания
+modal.addEventListener('touchstart', (e) => {
+    // ВАЖНО: Разрешаем свайп окна вниз ТОЛЬКО если история прокручена в самый верх.
+    // Иначе окно будет закрываться, когда пользователь просто листает историю.
+    if (modalBody && modalBody.scrollTop > 0) return;
+
+    startY = e.touches[0].clientY;
+    isDragging = true;
+    
+    // Отключаем плавность на время свайпа, чтобы окно двигалось точно за пальцем
+    modal.style.transition = 'none'; 
+}, { passive: true });
+
+// Движение пальца
+modal.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    
+    currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY;
+
+    // Двигаем окно только вниз (deltaY > 0)
+    if (deltaY > 0) {
+        modal.style.transform = `translateY(${deltaY}px)`;
+    }
+}, { passive: true });
+
+// Конец касания
+modal.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    // Возвращаем плавную анимацию
+    modal.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'; 
+
+    const deltaY = currentY - startY;
+
+    // Если свайпнули вниз больше чем на 100 пикселей — закрываем
+    if (deltaY > 100) {
+        modal.classList.remove('active');
+    }
+    
+    // Очищаем инлайн-стили, чтобы снова работал CSS
+    modal.style.transform = ''; 
+});
