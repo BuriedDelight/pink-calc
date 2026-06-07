@@ -24,6 +24,7 @@ window.onload = function() {
     fetch('/api/history', { headers: getHeaders() })
         .then(response => response.json())
         .then(data => {
+            historyDiv.innerHTML = ''; // ОЧИЩАЕМ перед отрисовкой!
             if (data && data.length > 0) {
                 data.forEach(item => {
                     historyDiv.innerHTML += `<div class="history-item">${item.expression} = ${item.result}</div>`;
@@ -48,6 +49,7 @@ function toggleModal() {
 // 5. Очистка
 function clearAll() {
     clearDisplay();
+    historyDiv.innerHTML = '';
 }
 
 function clearDisplay() {

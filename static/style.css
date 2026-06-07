@@ -6,6 +6,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh;
     font-family: 'Fredoka', sans-serif;
     touch-action: manipulation;
 }
@@ -14,7 +15,8 @@ body {
     width: 100%;
     max-width: 400px;
     background-color: #fce4ec;
-    height: 100vh;
+    height: 100vh; /*  fallback для очень старых браузеров */
+    height: 100dvh; 
     display: flex;
     flex-direction: column;
     box-shadow: 0 10px 40px rgba(233, 30, 99, 0.3);
@@ -40,7 +42,7 @@ body {
 }
 
 .logo {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     color: #d81b60;
     font-weight: 1000;
     letter-spacing: 0.5px;
@@ -60,7 +62,7 @@ body {
     align-items: center;
     gap: 5px;
     font-family: 'Fredoka', sans-serif;
-    font-size: 0.9rem;
+    font-size: 2rem;
     font-weight: 500;
 }
 
