@@ -1,0 +1,21 @@
+{
+  "name": "Barbie Calc",
+  "short_name": "BarbieCalc",
+  "description": "Лучший калькулятор для фанатов Barbie",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffc0cb",
+  "theme_color": "#ffc0cb",
+  "icons": [
+    {
+      "src": "/static/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
