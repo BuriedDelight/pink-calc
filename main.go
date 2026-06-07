@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	// Раздача статических файлов (иконок, картинок, стилей)
+	// Раздача статических файлов (иконок, картинок, стилей) и т.п.
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
