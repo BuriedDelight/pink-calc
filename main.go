@@ -62,6 +62,13 @@ func initDB() {
 }
 
 func historyHandler(w http.ResponseWriter, r *http.Request) {
+	// Получаем ID клиента из заголовка для обоих методов
+	clientID := r.Header.Get("X-Client-ID")
+	if clientID == "" {
+		http.Error(w, "Отсутствует ID клиента", http.StatusBadRequest)
+		return
+	}
+
 	if r.Method == http.MethodPost {
 		var entry CalcEntry
 		if err := json.NewDecoder(r.Body).Decode(&entry); err != nil {
@@ -69,8 +76,9 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Сохранение в БД
-		_, err := db.Exec("INSERT INTO history (expression, result) VALUES ($1, $2)", entry.Expression, entry.Result)
+		// Сохранение в БД с привязкой к clientID
+		_, err := db.Exec("INSERT INTO history (expression, result, client_id) VALUES ($1, $2, $3)", 
+			entry.Expression, entry.Result, clientID)
 		if err != nil {
 			http.Error(w, "Ошибка сохранения", http.StatusInternalServerError)
 			log.Printf("Ошибка INSERT: %v", err)
@@ -79,8 +87,9 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 
 	} else if r.Method == http.MethodGet {
-		// Получение последних 20 записей
-		rows, err := db.Query("SELECT expression, result FROM history ORDER BY created_at ASC LIMIT 20")
+		// Получение только записей ЭТОГО клиента
+		rows, err := db.Query("SELECT expression, result FROM history WHERE client_id = $1 ORDER BY created_at ASC LIMIT 20", 
+			clientID)
 		if err != nil {
 			http.Error(w, "Ошибка получения данных", http.StatusInternalServerError)
 			log.Printf("Ошибка SELECT: %v", err)
@@ -96,7 +105,6 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// Если история пуста, отдаем пустой массив вместо null
 		if history == nil {
 			history = []CalcEntry{}
 		}

@@ -1,0 +1,118 @@
+// 1. Инициализация ID клиента
+let clientId = localStorage.getItem('calc_client_id');
+if (!clientId) {
+    clientId = 'user_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('calc_client_id', clientId);
+}
+
+// 2. Вспомогательная функция для заголовков
+function getHeaders() {
+    return { 
+        'Content-Type': 'application/json', 
+        'X-Client-ID': clientId 
+    };
+}
+
+const display = document.getElementById('display');
+const historyDiv = document.getElementById('history');
+const historyModal = document.getElementById('historyModal');
+const modalHistoryList = document.getElementById('modalHistoryList');
+let errorState = false;
+
+// 3. Загрузка истории при старте
+window.onload = function() {
+    fetch('/api/history', { headers: getHeaders() })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                data.forEach(item => {
+                    historyDiv.innerHTML += `<div class="history-item">${item.expression} = ${item.result}</div>`;
+                });
+                scrollToBottom();
+            }
+        })
+        .catch(err => console.error("Ошибка загрузки истории:", err));
+};
+
+// 4. Функция открытия/закрытия модального окна
+function toggleModal() {
+    if (historyModal.classList.contains('active')) {
+        historyModal.classList.remove('active');
+    } else {
+        modalHistoryList.innerHTML = historyDiv.innerHTML || '<div style="text-align: center; color: #f48fb1; margin-top: 20px;">История пуста</div>';
+        historyModal.classList.add('active');
+        modalHistoryList.scrollTop = modalHistoryList.scrollHeight;
+    }
+}
+
+// 5. Очистка
+function clearAll() {
+    clearDisplay();
+}
+
+function clearDisplay() {
+    display.innerText = '0';
+    errorState = false;
+}
+
+function deleteLast() {
+    if (errorState) return clearDisplay();
+    display.innerText = display.innerText.slice(0, -1);
+    if (display.innerText === '') display.innerText = '0';
+}
+
+function scrollToBottom() {
+    historyDiv.scrollTop = historyDiv.scrollHeight;
+}
+
+// 6. Добавление записи (объединили в одну версию с заголовками!)
+function addHistoryItem(expression, result) {
+    const newItem = `<div class="history-item">${expression} = ${result}</div>`;
+    historyDiv.innerHTML += newItem;
+    scrollToBottom();
+
+    // Теперь здесь ТОЧНО есть заголовки с clientID
+    fetch('/api/history', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ 
+            expression: expression.toString(), 
+            result: result.toString() 
+        })
+    }).catch(err => console.error("Ошибка сохранения в БД:", err));
+}
+
+// 7. Основная логика калькулятора
+function calculate() {
+    try {
+        const originalText = display.innerText;
+        let expression = originalText.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+        
+        expression = expression.replace(/(\d|\)|%)\s*\(/g, '$1*(');
+        expression = expression.replace(/\)\s*(\d|\()/g, ')*$1');
+        
+        expression = expression.replace(/(.*?)([+\-])(\d+(?:\.\d+)?)%/g, function(match, baseExpr, operator, percentVal) {
+            try {
+                let base = new Function('return ' + baseExpr)();
+                let calculatedPercent = (base * parseFloat(percentVal)) / 100;
+                return baseExpr + operator + calculatedPercent;
+            } catch(e) { return match; }
+        });
+        
+        expression = expression.replace(/(\d+(?:\.\d+)?)%/g, function(match, percentVal) {
+            return parseFloat(percentVal) / 100;
+        });
+        
+        let result = new Function('return ' + expression)();
+        result = Math.round(result * 100000000) / 100000000;
+        
+        if (!isFinite(result) || isNaN(result)) throw new Error("Math Error");
+        
+        addHistoryItem(originalText, result);
+        display.innerText = result;
+    } catch (e) {
+        display.innerText = 'Ошибка';
+        errorState = true;
+        setTimeout(clearDisplay, 1500);
+    }
+}

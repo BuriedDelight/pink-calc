@@ -1,251 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Barbie Calc for Vio</title>
-    
     <link rel="icon" type="image/png" href="/static/icon.png">
-    <link rel="apple-touch-icon" href="/static/icon.png">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="BarbieCalc">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <link rel="manifest" href="/static/manifest.json">
-    <script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/static/sw.js')
-        .then(() => console.log('Service Worker зарегистрирован!'));
-    }
-    </script>
-
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #ffe4e1; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Fredoka', sans-serif;
-            touch-action: manipulation;
-        }
-
-        .calculator {
-            width: 100%;
-            max-width: 400px;
-            background-color: #fce4ec; 
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 40px rgba(233, 30, 99, 0.3);
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-            overflow: hidden; 
-        }
-
-        @media (min-width: 401px) {
-            .calculator {
-                height: auto;
-                border-radius: 40px; 
-                margin: 20px 0;
-            }
-        }
-
-        .header-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin-bottom: auto;
-        }
-
-        .logo {
-            font-size: 1.2rem;
-            color: #d81b60;
-            font-weight: 1000;
-            letter-spacing: 0.5px;
-            padding-left: 5px;
-        }
-
-        .btn-history-icon {
-            background: none;
-            border: none;
-            color: #d81b60;
-            cursor: pointer;
-            padding: 5px;
-            margin-top: 8px;
-            margin-left: 0px;
-            transition: transform 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-family: 'Fredoka', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .btn-history-icon:active {
-            transform: scale(0.9);
-        }
-
-        .modal-overlay {
-            position: absolute;
-            top: 100%; 
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(252, 228, 236, 0.98); 
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            transition: top 0.3s ease-in-out;
-            padding: 20px;
-            box-sizing: border-box;
-            border-radius: inherit;
-        }
-
-        .modal-overlay.active {
-            top: 0; 
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #d81b60;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f8bbd0;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: #d81b60;
-            font-size: 1.8rem;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            text-align: right;
-            color: #c2185b;
-            font-size: 1.3rem;
-            padding-right: 10px;
-            scrollbar-width: thin;
-            scrollbar-color: #f48fb1 transparent;
-        }
-
-        .modal-body .history-item {
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #f8bbd0;
-            padding-bottom: 5px;
-        }
-
-        .screen {
-            flex: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-            margin-top: 10px;
-            height: 150px; 
-        }
-
-        .history {
-            flex: 1;
-            overflow-y: auto;
-            text-align: right;
-            color: #f06292;
-            font-size: 1rem;
-            padding-bottom: 0px;
-            scrollbar-width: none; 
-        }
-        .history::-webkit-scrollbar {
-            display: none; 
-        }
-        .history-item {
-            margin-bottom: 5px;
-        }
-
-        .display {
-            color: #c2185b; 
-            text-align: right;
-            font-size: 2.5rem;
-            font-weight: 500;
-            word-wrap: break-word;
-            word-break: break-all;
-            line-height: 1;
-        }
-
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-
-        button {
-            border: none;
-            border-radius: 70%; 
-            aspect-ratio: 1; 
-            font-size: 2rem;
-            font-family: 'Fredoka', sans-serif;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: filter 0.1s;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        button:active {
-            filter: brightness(0.8);
-        }
-
-        .btn-number {
-            background-color: #f8bbd0; 
-            color: #880e4f;
-        }
-
-        .btn-action {
-            background-color: #f48fb1; 
-            color: #880e4f;
-        }
-
-        .btn-operator {
-            background-color: #ec407a; 
-            color: white;
-            font-size: 2.5rem;
-            padding-bottom: 6px; 
-            box-sizing: border-box;
-            line-height: 1;
-        }
-
-        .btn-paren {
-            background-color: #f8bbd0;
-            color: #880e4f;
-            padding-bottom: 4px;
-        }
-
-        .btn-equal {
-            grid-column: span 4;
-            border-radius: 50px;
-            aspect-ratio: auto; 
-            padding: 15px 0;
-            padding-bottom: 21px; 
-        }
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="calculator">
@@ -253,10 +15,8 @@
             <div class="logo">BarbieCalc for Vio</div>
             <button class="btn-history-icon" onclick="toggleModal()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
+                    <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                Журнал
             </button>
         </div>
 
@@ -265,8 +25,7 @@
                 <span>Прошлые действия</span>
                 <button class="modal-close" onclick="toggleModal()">×</button>
             </div>
-            <div class="modal-body" id="modalHistoryList">
-            </div>
+            <div class="modal-body" id="modalHistoryList"></div>
         </div>
 
         <div class="screen">
@@ -279,150 +38,25 @@
             <button class="btn-action" onclick="deleteLast()">⌫</button>
             <button class="btn-action" onclick="appendValue('%')">%</button>
             <button class="btn-operator" onclick="appendValue('÷')">÷</button>
-            
             <button class="btn-number" onclick="appendValue('7')">7</button>
             <button class="btn-number" onclick="appendValue('8')">8</button>
             <button class="btn-number" onclick="appendValue('9')">9</button>
             <button class="btn-operator" onclick="appendValue('×')">×</button>
-            
             <button class="btn-number" onclick="appendValue('4')">4</button>
             <button class="btn-number" onclick="appendValue('5')">5</button>
             <button class="btn-number" onclick="appendValue('6')">6</button>
             <button class="btn-operator" onclick="appendValue('−')">−</button>
-            
             <button class="btn-number" onclick="appendValue('1')">1</button>
             <button class="btn-number" onclick="appendValue('2')">2</button>
             <button class="btn-number" onclick="appendValue('3')">3</button>
             <button class="btn-operator" onclick="appendValue('+')">+</button>
-            
             <button class="btn-paren" onclick="appendValue('(')">(</button>
             <button class="btn-paren" onclick="appendValue(')')">)</button>
             <button class="btn-number" onclick="appendValue('0')">0</button>
             <button class="btn-number" onclick="appendValue('.')">.</button>
-            
             <button class="btn-operator btn-equal" onclick="calculate()">=</button>
         </div>
     </div>
-
-    <script>
-        const display = document.getElementById('display');
-        const historyDiv = document.getElementById('history');
-        const historyModal = document.getElementById('historyModal');
-        const modalHistoryList = document.getElementById('modalHistoryList');
-        let errorState = false;
-
-        // Загрузка истории из PostgreSQL при старте
-        window.onload = function() {
-            fetch('/api/history')
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.length > 0) {
-                        data.forEach(item => {
-                            const newItem = `<div class="history-item">${item.expression} = ${item.result}</div>`;
-                            historyDiv.innerHTML += newItem;
-                        });
-                        scrollToBottom();
-                    }
-                })
-                .catch(err => console.error("Ошибка загрузки истории:", err));
-        };
-
-        function toggleModal() {
-            if (historyModal.classList.contains('active')) {
-                historyModal.classList.remove('active');
-            } else {
-                modalHistoryList.innerHTML = historyDiv.innerHTML || '<div style="text-align: center; color: #f48fb1; margin-top: 20px;">История пуста</div>';
-                historyModal.classList.add('active');
-                modalHistoryList.scrollTop = modalHistoryList.scrollHeight;
-            }
-        }
-        
-        function appendValue(value) {
-            if (errorState) clearDisplay();
-            if (display.innerText === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
-                display.innerText = value;
-            } else {
-                display.innerText += value;
-            }
-        }
-        
-        function clearDisplay() {
-            display.innerText = '0';
-            errorState = false;
-        }
-
-        function clearAll() {
-            clearDisplay();
-            historyDiv.innerHTML = '';
-            // Очищаем локально, но не удаляем из БД (история вернется при перезагрузке)
-            modalHistoryList.innerHTML = '<div style="text-align: center; color: #f48fb1; margin-top: 20px;">История пуста</div>';
-        }
-        
-        function deleteLast() {
-            if (errorState) return clearDisplay();
-            display.innerText = display.innerText.slice(0, -1);
-            if (display.innerText === '') display.innerText = '0';
-        }
-
-        function scrollToBottom() {
-            historyDiv.scrollTop = historyDiv.scrollHeight;
-        }
-
-        function addHistoryItem(expression, result) {
-            // Добавляем на экран
-            const newItem = `<div class="history-item">${expression} = ${result}</div>`;
-            historyDiv.innerHTML += newItem;
-            scrollToBottom();
-
-            // Отправляем в БД (PostgreSQL через Go)
-            fetch('/api/history', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    expression: expression.toString(), 
-                    result: result.toString() 
-                })
-            }).catch(err => console.error("Ошибка сохранения в БД:", err));
-        }
-        
-        function calculate() {
-            try {
-                const originalText = display.innerText;
-                let expression = originalText.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
-                
-                expression = expression.replace(/(\d|\)|%)\s*\(/g, '$1*(');
-                expression = expression.replace(/\)\s*(\d|\()/g, ')*$1');
-                
-                expression = expression.replace(/(.*?)([+\-])(\d+(?:\.\d+)?)%/g, function(match, baseExpr, operator, percentVal) {
-                    try {
-                        let base = new Function('return ' + baseExpr)();
-                        let calculatedPercent = (base * parseFloat(percentVal)) / 100;
-                        return baseExpr + operator + calculatedPercent;
-                    } catch(e) {
-                        return match; 
-                    }
-                });
-                
-                expression = expression.replace(/(\d+(?:\.\d+)?)%/g, function(match, percentVal) {
-                    return parseFloat(percentVal) / 100;
-                });
-                
-                let result = new Function('return ' + expression)();
-                
-                result = Math.round(result * 100000000) / 100000000;
-                
-                if (!isFinite(result) || isNaN(result)) throw new Error("Math Error");
-                
-                addHistoryItem(originalText, result);
-                display.innerText = result;
-            } catch (e) {
-                display.innerText = 'Ошибка';
-                errorState = true;
-                setTimeout(clearDisplay, 1500);
-            }
-        }
-    </script>
+    <script src="/static/script.js"></script>
 </body>
 </html>
