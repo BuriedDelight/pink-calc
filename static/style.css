@@ -214,7 +214,7 @@ button:active {
 }
 
 .btn-equal {
-    grid-column: span 4;
+    grid-column: span 2;
     border-radius: 50px;
     aspect-ratio: auto;
     padding: 15px 0;
