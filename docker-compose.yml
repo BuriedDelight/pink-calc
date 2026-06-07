@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # 1. База данных PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: calc-db
+    restart: unless-stopped
+    env_file:
+      - .env # Говорим Докеру брать пароли отсюда
+    volumes:
+      - db_data:/var/lib/postgresql/data # Место, где физически лежат файлы БД
+
+  # 2. Go-приложение
+  app:
+    build: .
+    container_name: barbie-calc-app
+    restart: unless-stopped
+    ports:
+      - "80:8080" # отдаем наружу по 80 порту
+    env_file:
+      - .env # Приложение тоже должно знать логин/пароль для подключения
+    depends_on:
+      - db # Запускать приложение только после старта базы
+
+volumes:
+  # Объявляем "постоянный диск" для базы данных
+  db_data:
