@@ -3,6 +3,7 @@ FROM golang:1.22-alpine AS builder
 WORKDIR /app
 COPY go.mod ./
 COPY . .
+RUN go mod tidy 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o calculator .
 
 # Этап 2: Запуск (т.к. голанг огромный)
