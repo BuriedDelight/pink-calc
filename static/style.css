@@ -39,13 +39,19 @@ html, body {
 @media (max-width: 500px) {
     .calculator {
         max-width: 100%; 
-        width: 100vw; /* Принудительно растягиваем на всю ширину окна */
-        padding: 10px 5px; /* Уменьшили боковые отступы до 5px (чтобы было почти вплотную, как на Android) */
+        width: 100vw; 
+        
+        /* Делаем умные отступы с учетом системных зон iOS */
+        padding-top: calc(15px + env(safe-area-inset-top)); /* Отступ сверху от Dynamic Island */
+        padding-left: 5px; /* Боковые отступы */
+        padding-right: 5px; 
+        padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* Отступ снизу от полоски Home */
+        
         border-radius: 0; 
     }
 
     .buttons {
-        gap: 8px; /* Расстояние между кнопками */
+        gap: 8px;
     }
 }
 
