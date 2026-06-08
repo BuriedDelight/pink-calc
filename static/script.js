@@ -48,6 +48,21 @@ function toggleModal() {
     }
 }
 
+// Функция для добавления пробелов между тысячами
+function formatWithSpaces(str) {
+    // Сначала убираем все пробелы, если они там уже были
+    let cleanStr = str.replace(/\s/g, '');
+    
+    // Ищем все числа и форматируем их
+    return cleanStr.replace(/\d+(\.\d+)?/g, function(match) {
+        let parts = match.split('.');
+        // Регулярка для разделения по 3 цифры
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        // Соединяем обратно с дробной частью (если она есть)
+        return parts.join('.');
+    });
+}
+
 // 5. Очистка
 function clearAll() {
     clearDisplay();
@@ -60,17 +75,33 @@ function clearDisplay() {
 
 function deleteLast() {
     if (errorState) return clearDisplay();
-    display.innerText = display.innerText.slice(0, -1);
-    if (display.innerText === '') display.innerText = '0';
+    
+    // Берем текст и очищаем его от пробелов перед удалением символа
+    let current = display.innerText.replace(/\s/g, '');
+    current = current.slice(0, -1);
+    
+    if (current === '') {
+        display.innerText = '0';
+    } else {
+        // Возвращаем на экран с пробелами
+        display.innerText = formatWithSpaces(current);
+    }
 }
 
 function appendValue(value) {
     if (errorState) clearDisplay();
-    if (display.innerText === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
-        display.innerText = value;
+    
+    // Работаем с "чистой" строкой без пробелов
+    let current = display.innerText.replace(/\s/g, '');
+    
+    if (current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
+        current = value;
     } else {
-        display.innerText += value;
+        current += value;
     }
+    
+    // Обновляем экран красивым текстом
+    display.innerText = formatWithSpaces(current);
 }
 
 function scrollToBottom() {
@@ -97,7 +128,8 @@ function addHistoryItem(expression, result) {
 // 7. Основная логика калькулятора
 function calculate() {
     try {
-        const originalText = display.innerText;
+        const textForScreen = display.innerText; 
+        const originalText = display.innerText.replace(/\s/g, '');
         let expression = originalText.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
         
         expression = expression.replace(/(\d|\)|%)\s*\(/g, '$1*(');
