@@ -100,8 +100,7 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 		defer rows.Close()
 
 		var history []CalcEntry
-		for rows.Next() 
-		{
+		for rows.Next() {
             var e CalcEntry
             if err := rows.Scan(&e.Expression, &e.Result, &e.CreatedAt); err == nil {
                 history = append(history, e)
