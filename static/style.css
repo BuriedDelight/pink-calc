@@ -50,9 +50,11 @@ html, body {
 
 .header-container {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: auto;
+    flex-direction: row; /* Выстраиваем элементы в строку */
+    justify-content: space-between; /* Логотип прилипнет влево, кнопка — вправо */
+    align-items: center; /* Выравниваем их по центру по вертикали */
+    flex: 0 0 auto;
+    width: 100%; /* Обязательно на всю ширину */
 }
 
 .logo {
@@ -66,22 +68,21 @@ html, body {
 .btn-history-icon {
     background: none;
     border: none;
-    color: #d26a90;
+    color: #d81b60;
     cursor: pointer;
     padding: 5px;
-    margin-top: 8px;
-    margin-right: 15px;
+    
+    margin: 0; /* Сбрасываем старые кривые отступы */
+    margin-right: 10px;
+    
     transition: transform 0.2s;
     display: flex;
-    align-items: right;
-    gap: 5px;
-    font-family: 'Fredoka', sans-serif;
-    font-size: 7rem;
-    font-weight: 500;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent; /* Убирает серый квадрат при тапе на iOS */
 }
 
 .btn-history-icon:active {
-    transform: scale(0.9);
+    transform: scale(0.8);
 }
 
 .modal-overlay {
