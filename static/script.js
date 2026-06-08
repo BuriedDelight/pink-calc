@@ -20,16 +20,22 @@ const modalHistoryList = document.getElementById('modalHistoryList');
 let errorState = false;
 
 // 3. Загрузка истории при старте
-// Стало так:
 document.addEventListener('DOMContentLoaded', () => {
     fetch('/api/history', { headers: getHeaders() })
         .then(response => response.json())
         .then(data => {
-            console.log("Данные с сервера:", data); // ДОБАВИЛИ ЛОГ ДЛЯ ПРОВЕРКИ
+            console.log("Данные с сервера:", data);
             historyDiv.innerHTML = ''; 
             if (data && data.length > 0) {
                 data.forEach(item => {
-                    historyDiv.innerHTML += `<div class="history-item">${item.expression} = ${item.result}</div>`;
+                    // Форматируем дату, пришедшую с бэкенда (из поля created_at)
+                    const dateTimeStr = formatDateTime(item.created_at);
+                    
+                    historyDiv.innerHTML += `
+                        <div class="history-item">
+                            <div class="history-date">${dateTimeStr}</div>
+                            <div class="history-math">${item.expression} = ${item.result}</div>
+                        </div>`;
                 });
                 scrollToBottom();
             }
@@ -46,6 +52,16 @@ function toggleModal() {
         historyModal.classList.add('active');
         modalHistoryList.scrollTop = modalHistoryList.scrollHeight;
     }
+}
+
+// Функция для красивого форматирования даты и времени
+function formatDateTime(dateStr) {
+    const d = dateStr ? new Date(dateStr) : new Date();
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${day}.${month} ${hours}:${minutes}`;
 }
 
 // Функция для добавления пробелов между тысячами
@@ -108,13 +124,19 @@ function scrollToBottom() {
     historyDiv.scrollTop = historyDiv.scrollHeight;
 }
 
-// 6. Добавление записи (объединили в одну версию с заголовками!)
+// 6. Добавление записи
 function addHistoryItem(expression, result) {
-    const newItem = `<div class="history-item">${expression} = ${result}</div>`;
+    const dateTimeStr = formatDateTime(); // Текущее время для новой записи
+    
+    const newItem = `
+        <div class="history-item">
+            <div class="history-date">${dateTimeStr}</div>
+            <div class="history-math">${expression} = ${result}</div>
+        </div>`;
+        
     historyDiv.innerHTML += newItem;
     scrollToBottom();
 
-    // Теперь здесь ТОЧНО есть заголовки с clientID
     fetch('/api/history', {
         method: 'POST',
         headers: getHeaders(),

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -14,8 +15,9 @@ import (
 var db *sql.DB
 
 type CalcEntry struct {
-	Expression string `json:"expression"`
-	Result     string `json:"result"`
+    Expression string    `json:"expression"`
+    Result     string    `json:"result"`
+    CreatedAt  time.Time `json:"created_at"`
 }
 
 func main() {
@@ -88,8 +90,8 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else if r.Method == http.MethodGet {
 		// Получение только записей ЭТОГО клиента
-		rows, err := db.Query("SELECT expression, result FROM history WHERE client_id = $1 ORDER BY created_at ASC LIMIT 20", 
-			clientID)
+		rows, err := db.Query("SELECT expression, result, created_at FROM history WHERE client_id = $1 ORDER BY created_at ASC LIMIT 20", 
+            clientID)
 		if err != nil {
 			http.Error(w, "Ошибка получения данных", http.StatusInternalServerError)
 			log.Printf("Ошибка SELECT: %v", err)
@@ -98,12 +100,15 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 		defer rows.Close()
 
 		var history []CalcEntry
-		for rows.Next() {
-			var e CalcEntry
-			if err := rows.Scan(&e.Expression, &e.Result); err == nil {
-				history = append(history, e)
-			}
-		}
+		for rows.Next() 
+		{
+            var e CalcEntry
+            if err := rows.Scan(&e.Expression, &e.Result, &e.CreatedAt); err == nil {
+                history = append(history, e)
+            } else {
+                log.Printf("Ошибка при чтении строки: %v", err) // Полезно для отладки
+            }
+        }
 
 		if history == nil {
 			history = []CalcEntry{}

@@ -150,7 +150,6 @@ html, body {
 .modal-body {
     flex: 1;
     overflow-y: auto;
-    text-align: right;
     color: #c2185b;
     font-size: 1.3rem;
     padding-right: 10px;
@@ -186,8 +185,28 @@ html, body {
 .history::-webkit-scrollbar {
     display: none;
 }
+
+/* Контейнер для одной записи в истории */
 .history-item {
-    margin-bottom: 5px;
+    display: flex;
+    flex-direction: column; /* Выстраиваем дату и вычисление вертикально */
+    align-items: flex-end;   /* Прижимаем всё к правому краю */
+    margin-bottom: 12px;     /* Чуть увеличим отступ между группами записей */
+}
+
+/* Стиль для маленькой даты над примером */
+.history-date {
+    font-size: 0.75rem;      /* Маленький шрифт */
+    color: #f48fb1;          /* Приглушенный розовый цвет, чтобы не отвлекать */
+    margin-bottom: 2px;      /* Отступ до самого вычисления */
+    font-weight: 400;
+    letter-spacing: 0.3px;
+}
+
+/* Стиль для самого математического выражения (чтобы перебить старый стиль строки) */
+.history-math {
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .display {
