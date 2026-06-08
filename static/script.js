@@ -20,11 +20,13 @@ const modalHistoryList = document.getElementById('modalHistoryList');
 let errorState = false;
 
 // 3. Загрузка истории при старте
-window.onload = function() {
+// Стало так:
+document.addEventListener('DOMContentLoaded', () => {
     fetch('/api/history', { headers: getHeaders() })
         .then(response => response.json())
         .then(data => {
-            historyDiv.innerHTML = ''; // ОЧИЩАЕМ перед отрисовкой!
+            console.log("Данные с сервера:", data); // ДОБАВИЛИ ЛОГ ДЛЯ ПРОВЕРКИ
+            historyDiv.innerHTML = ''; 
             if (data && data.length > 0) {
                 data.forEach(item => {
                     historyDiv.innerHTML += `<div class="history-item">${item.expression} = ${item.result}</div>`;
@@ -33,7 +35,7 @@ window.onload = function() {
             }
         })
         .catch(err => console.error("Ошибка загрузки истории:", err));
-};
+});
 
 // 4. Функция открытия/закрытия модального окна
 function toggleModal() {
