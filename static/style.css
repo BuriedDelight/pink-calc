@@ -27,11 +27,25 @@ html, body {
     overflow: hidden;
 }
 
-@media (min-width: 401px) {
+/* @media (min-width: 401px) {
     .calculator {
         height: auto;
         border-radius: 40px;
         margin: 20px 0;
+    }
+} */
+
+/* Специально для мобильных экранов (включая широкие iPhone) */
+@media (max-width: 430px) {
+    .calculator {
+        max-width: 100%; /* Игнорируем ограничение в 400px */
+        padding: 10px 15px; /* Уменьшаем внутренние отступы (было 20px) */
+        border-radius: 0; /* Убираем скругления контейнера, раз он на весь экран */
+    }
+
+    /* Если кнопки кажутся слишком мелкими, можно чуть уменьшить расстояние между ними */
+    .buttons {
+        gap: 8px;
     }
 }
 
