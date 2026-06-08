@@ -35,7 +35,7 @@ html, body {
         width: 100vw; 
         
         /* Делаем умные отступы с учетом системных зон iOS */
-        padding-top: calc(15px + env(safe-area-inset-top)); /* Отступ сверху от Dynamic Island */
+        padding-top: calc(2px + env(safe-area-inset-top)); /* Отступ сверху от Dynamic Island */
         padding-left: 5px; /* Боковые отступы */
         padding-right: 5px; 
         padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* Отступ снизу от полоски Home */
@@ -171,7 +171,7 @@ html, body {
     justify-content: flex-end;
     margin-bottom: 20px;
     margin-top: 10px;
-    height: 170px;
+    height: 160px;
 }
 
 .history {
