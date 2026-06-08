@@ -152,8 +152,13 @@ function calculate() {
         
         if (!isFinite(result) || isNaN(result)) throw new Error("Math Error");
         
-        addHistoryItem(originalText, result);
-        display.innerText = result;
+        // Форматируем результат для красоты
+        let formattedResult = formatWithSpaces(result.toString());
+        
+        // В историю передаем красивый текст и красивый результат
+        addHistoryItem(textForScreen, formattedResult); 
+        
+        display.innerText = formattedResult;
     } catch (e) {
         display.innerText = 'Ошибка';
         errorState = true;
