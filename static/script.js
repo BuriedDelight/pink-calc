@@ -173,23 +173,33 @@ let startY = 0;
 let currentY = 0;
 let isDragging = false;
 
+
 // Начало касания
 modal.addEventListener('touchstart', (e) => {
-    // ВАЖНО: Разрешаем свайп окна вниз ТОЛЬКО если история прокручена в самый верх.
-    // Иначе окно будет закрываться, когда пользователь просто листает историю.
-    if (modalBody && modalBody.scrollTop > 0) return;
+    // Если палец коснулся блока с историей — жестко блокируем перетаскивание окна.
+    // Теперь здесь всегда будет работать только обычный скролл текста.
+    if (e.target.closest('.modal-body')) {
+        return; 
+    }
 
+    // Если коснулись шапки или области над ней — разрешаем тащить окно вниз
     startY = e.touches[0].clientY;
     isDragging = true;
     
-    // Отключаем плавность на время свайпа, чтобы окно двигалось точно за пальцем
+    // Отключаем плавность на время свайпа, чтобы окно шло точно за пальцем
     modal.style.transition = 'none'; 
 }, { passive: true });
 
-// Движение пальца
+    // Движение пальца
+    // Движение пальца
 modal.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
     
+    // БЛОКИРУЕМ ПОВЕДЕНИЕ БРАУЗЕРА (ОБНОВЛЕНИЕ СТРАНИЦЫ)
+    if (e.cancelable) {
+        e.preventDefault(); 
+    }
+
     currentY = e.touches[0].clientY;
     const deltaY = currentY - startY;
 
@@ -197,10 +207,10 @@ modal.addEventListener('touchmove', (e) => {
     if (deltaY > 0) {
         modal.style.transform = `translateY(${deltaY}px)`;
     }
-}, { passive: true });
+}, { passive: false }); // <-- ВАЖНО: здесь должно быть false
 
-// Конец касания
-modal.addEventListener('touchend', (e) => {
+    // Конец касания
+    modal.addEventListener('touchend', (e) => {
     if (!isDragging) return;
     isDragging = false;
     
