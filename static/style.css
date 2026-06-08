@@ -70,7 +70,7 @@ html, body {
     border: none;
     color: #ec4881;
     cursor: pointer;
-    padding: 5px;
+    padding: 0px;
     
     margin: 0; /* Сбрасываем старые кривые отступы */
     margin-right: 0px;
