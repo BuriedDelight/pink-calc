@@ -1,18 +1,38 @@
-const CACHE_NAME = 'barbie-calc-v1';
-const ASSETS = [
-  '/',
-  '/static/icon.png',
-  '/static/manifest.json'
+const CACHE_NAME = 'barbie-calc-cache-v1';
+
+// Список того, что нужно сохранить на телефон
+const urlsToCache = [
+    '/', // Главная страница (HTML)
+    '/static/style.css',
+    '/static/script.js',
+    '/static/icon.png',
+    '/static/manifest.json',
+    'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap' // Шрифты тоже кэшируем!
 ];
 
-// Установка: кэшируем файлы
-self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
+// 1. При установке кэшируем все нужные файлы
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('Открыт кэш');
+                return cache.addAll(urlsToCache);
+            })
+    );
 });
 
-// Работа: отдаем из кэша, если нет сети
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => response || fetch(event.request))
-  );
+// 2. При запросах сети отдаем файлы из кэша, если интернета нет
+self.addEventListener('fetch', event => {
+    // Игнорируем запросы к базе данных (API), их кэшировать не нужно
+    if (event.request.url.includes('/api/')) {
+        return; 
+    }
+
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                // Если файл найден в кэше — отдаем его. Если нет — идем в сеть.
+                return response || fetch(event.request);
+            })
+    );
 });

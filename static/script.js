@@ -59,9 +59,10 @@ function formatDateTime(dateStr) {
     const d = dateStr ? new Date(dateStr) : new Date();
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = String(d.getFullYear()).padStart(4, '0');
     const hours = String(d.getHours()).padStart(2, '0');
     const minutes = String(d.getMinutes()).padStart(2, '0');
-    return `${day}.${month} ${hours}:${minutes}`;
+    return `${day}.${month}.${year} ${hours}:${minutes}`;
 }
 
 // Функция для добавления пробелов между тысячами
@@ -213,7 +214,6 @@ modal.addEventListener('touchstart', (e) => {
 }, { passive: true });
 
     // Движение пальца
-    // Движение пальца
 modal.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
     
@@ -249,3 +249,16 @@ modal.addEventListener('touchmove', (e) => {
     // Очищаем инлайн-стили, чтобы снова работал CSS
     modal.style.transform = ''; 
 });
+
+// Регистрация Service Worker для работы оффлайн
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker успешно зарегистрирован. Область:', registration.scope);
+            })
+            .catch(error => {
+                console.log('Ошибка регистрации ServiceWorker:', error);
+            });
+    });
+}
