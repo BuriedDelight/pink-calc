@@ -2,8 +2,8 @@
   "name": "Barbie Calc",
   "short_name": "BarbieCalc",
   "description": "Barbie калькулятор.",
-  "start_url": "/",
-  "display": "standalone",
+  "start_url": "https://calc4barbie.stilldrive.ru/",
+  "display": "fullscreen",
   "background_color": "#ffc0cb",
   "theme_color": "#ffc0cb",
   "icons": [
@@ -17,5 +17,13 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "orientation": "portrait",
+  "scope": "https://calc4barbie.stilldrive.ru/",
+  "display_override": [
+    "fullscreen",
+    "minimal-ui",
+    "window-controls-overlay"
+  ],
+  "iarc_rating_id": "0"
 }
