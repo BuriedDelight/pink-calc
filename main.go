@@ -24,12 +24,14 @@ func main() {
     initDB()
     defer db.Close()
 
+
     // Раздача статики (стили, иконки, манифест)
     http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-    // Главная страница
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        http.ServeFile(w, r, "templates/index.html")
+	// Сначала точный путь для Android
+    http.HandleFunc("/.well-known/assetlinks.json", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        http.ServeFile(w, r, "static/assetlinks.json")
     })
 
     // НОВЫЙ РОУТ ДЛЯ SERVICE WORKER (ДОЛЖЕН БЫТЬ ЗДЕСЬ!)
@@ -38,17 +40,16 @@ func main() {
         http.ServeFile(w, r, "static/sw.js") 
     })
 
+    // Главная страница
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        http.ServeFile(w, r, "templates/index.html")
+    })
+
     // API для истории
     http.HandleFunc("/api/history", historyHandler)
 
     fmt.Println("Сервер запущен на порту 8080...")
     log.Fatal(http.ListenAndServe(":8080", nil))
-
-	// Роут для подтверждения прав на Android APK (чтобы скрыть адресную строку)
-    http.HandleFunc("/.well-known/assetlinks.json", func(w http.ResponseWriter, r *http.Request) {
-        w.Header().Set("Content-Type", "application/json")
-        http.ServeFile(w, r, "static/assetlinks.json")
-    })
 }
 
 func initDB() {
