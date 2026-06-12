@@ -19,7 +19,6 @@
     }
   ],
   "orientation": "portrait",
-  "scope": "https://calc4barbie.stilldrive.ru/",
   "display_override": [
     "fullscreen",
     "minimal-ui",

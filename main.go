@@ -43,6 +43,12 @@ func main() {
 
     fmt.Println("Сервер запущен на порту 8080...")
     log.Fatal(http.ListenAndServe(":8080", nil))
+
+	// Роут для подтверждения прав на Android APK (чтобы скрыть адресную строку)
+    http.HandleFunc("/.well-known/assetlinks.json", func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        http.ServeFile(w, r, "static/assetlinks.json")
+    })
 }
 
 func initDB() {

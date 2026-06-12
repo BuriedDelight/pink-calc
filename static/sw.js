@@ -24,7 +24,7 @@ self.addEventListener('install', event => {
 // 2. При запросах сети отдаем файлы из кэша, если интернета нет
 self.addEventListener('fetch', event => {
     // Игнорируем запросы к базе данных (API), их кэшировать не нужно
-    if (event.request.url.includes('/api/')) {
+    if (event.request.url.includes('/api/') || event.request.url.includes('/.well-known/')) {
         return; 
     }
 
