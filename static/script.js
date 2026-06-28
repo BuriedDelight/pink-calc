@@ -222,6 +222,8 @@ function deleteLast() {
         // Возвращаем на экран с пробелами
         display.innerText = formatWithSpaces(current);
     }
+
+    display.scrollLeft = display.scrollWidth;
 }
 
 function appendValue(value) {
@@ -308,6 +310,8 @@ function calculate() {
         errorState = true;
         setTimeout(clearDisplay, 1500);
     }
+
+    display.scrollLeft = display.scrollWidth;
 }
 
 const modal = document.querySelector('.modal-overlay');
