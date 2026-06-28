@@ -243,11 +243,11 @@ function scrollToBottom() {
     historyDiv.scrollTop = historyDiv.scrollHeight;
 }
 
-// 6. Добавление записи
+// 6. Добавление записи (улучшенная версия)
 function addHistoryItem(expression, result) {
     const dateTimeStr = formatDateTime(); 
     
-    // Сначала обновляем интерфейс, чтобы пользователь видел результат
+    // Сразу рисуем в интерфейсе
     const newItem = `
         <div class="history-item">
             <div class="history-date">${dateTimeStr}</div>
@@ -256,10 +256,8 @@ function addHistoryItem(expression, result) {
     historyDiv.innerHTML += newItem;
     scrollToBottom();
 
-    // ПРОВЕРКА: если токена нет — просто выходим, не шлем на сервер
-    if (!jwtToken) {
-        return; 
-    }
+    // Если токена нет, просто не сохраняем в БД, но и не выдаем ошибку
+    if (!jwtToken) return;
 
     fetch('/api/history', {
         method: 'POST',
@@ -271,11 +269,11 @@ function addHistoryItem(expression, result) {
     })
     .then(res => {
         if (res.status === 401) {
-            console.error("Токен недействителен, нужно перелогиниться");
+            console.warn("Сессия истекла");
             logout();
         }
     })
-    .catch(err => console.error("Ошибка сохранения в БД:", err));
+    .catch(err => console.error("Фоновая ошибка сохранения:", err));
 }
 
 // 7. Основная логика калькулятора

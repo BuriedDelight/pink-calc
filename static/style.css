@@ -56,6 +56,13 @@ html, body {
     flex: 0 0 auto;
     width: 100%; /* Обязательно на всю ширину */
 }
+/* Контейнер для кнопок в шапке */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Расстояние между кнопкой Входа и историей */
+    margin-right: 5px;
+}
 
 .logo {
     font-size: 1.5rem;
@@ -286,25 +293,18 @@ button:active {
     padding-bottom: 21px;
 }
 
-/* Кнопка "Войти" на главном экране */
 .auth-toggle-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
     background: #f06292;
     color: white;
     border: none;
-    padding: 8px 15px;
-    
-    /* Сбрасываем стили круглых кнопок */
-    aspect-ratio: auto;
-    font-size: 16px;
+    padding: 6px 12px;
     border-radius: 20px;
-    
     font-family: 'Fredoka', sans-serif;
+    font-size: 14px;
     font-weight: 500;
     box-shadow: 0 4px 6px rgba(240, 98, 146, 0.3);
     cursor: pointer;
+    white-space: nowrap; /* Чтобы текст не переносился */
 }
 
 /* Стили окна авторизации */

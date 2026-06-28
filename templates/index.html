@@ -17,14 +17,17 @@
 <body>
     <div class="calculator">
         <div class="header-container">
-            <div class="logo">BarbieCalc for Vio</div>
-            <button class="btn-history-icon" onclick="toggleModal()">
-                <svg width="70" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            </button>
+            <div class="logo">BarbieCalc</div>
+            
+            <div class="header-actions">
+                <button id="authBtn" onclick="toggleAuthModal()" class="auth-toggle-btn">Войти</button>
+                <button class="btn-history-icon" onclick="toggleModal()">
+                    <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </button>
+            </div>
         </div>
-
         <div class="modal-overlay" id="historyModal">
             <div class="modal-header">
                 <span>Прошлые действия</span>
