@@ -214,9 +214,17 @@ html, body {
     text-align: right;
     font-size: 2.5rem;
     font-weight: 500;
-    word-wrap: break-word;
-    word-break: break-all;
     line-height: 1;
+    
+    /* Новые стили для горизонтального скролла */
+    white-space: nowrap; 
+    overflow-x: auto;
+    scrollbar-width: none; /* Прячем скроллбар в Firefox */
+}
+
+/* Прячем ползунок скроллбара для Chrome, Safari и iOS */
+.display::-webkit-scrollbar {
+    display: none; 
 }
 
 .buttons {

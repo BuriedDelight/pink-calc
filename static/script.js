@@ -188,15 +188,13 @@ function formatDateTime(dateStr) {
 
 // Функция для добавления пробелов между тысячами
 function formatWithSpaces(str) {
-    // Сначала убираем все пробелы, если они там уже были
+    // Сначала убираем все пробелы
     let cleanStr = str.replace(/\s/g, '');
     
-    // Ищем все числа и форматируем их
     return cleanStr.replace(/\d+(\.\d+)?/g, function(match) {
         let parts = match.split('.');
-        // Регулярка для разделения по 3 цифры
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-        // Соединяем обратно с дробной частью (если она есть)
+        // ВАЖНО: заменяем " " на "\u00A0" (неразрывный пробел)
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0"); 
         return parts.join('.');
     });
 }
@@ -240,6 +238,8 @@ function appendValue(value) {
     
     // Обновляем экран красивым текстом
     display.innerText = formatWithSpaces(current);
+
+    display.scrollLeft = display.scrollWidth;
 }
 
 function scrollToBottom() {
