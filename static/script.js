@@ -245,16 +245,21 @@ function scrollToBottom() {
 
 // 6. Добавление записи
 function addHistoryItem(expression, result) {
-    const dateTimeStr = formatDateTime(); // Текущее время для новой записи
+    const dateTimeStr = formatDateTime(); 
     
+    // Сначала обновляем интерфейс, чтобы пользователь видел результат
     const newItem = `
         <div class="history-item">
             <div class="history-date">${dateTimeStr}</div>
             <div class="history-math">${expression} = ${result}</div>
         </div>`;
-        
     historyDiv.innerHTML += newItem;
     scrollToBottom();
+
+    // ПРОВЕРКА: если токена нет — просто выходим, не шлем на сервер
+    if (!jwtToken) {
+        return; 
+    }
 
     fetch('/api/history', {
         method: 'POST',
@@ -263,7 +268,14 @@ function addHistoryItem(expression, result) {
             expression: expression.toString(), 
             result: result.toString() 
         })
-    }).catch(err => console.error("Ошибка сохранения в БД:", err));
+    })
+    .then(res => {
+        if (res.status === 401) {
+            console.error("Токен недействителен, нужно перелогиниться");
+            logout();
+        }
+    })
+    .catch(err => console.error("Ошибка сохранения в БД:", err));
 }
 
 // 7. Основная логика калькулятора
