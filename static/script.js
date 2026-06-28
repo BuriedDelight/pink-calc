@@ -310,7 +310,10 @@ function calculate() {
         addHistoryItem(textForScreen, formattedResult); 
         display.innerText = formattedResult;
     } catch (e) {
-        display.innerText = 'Ошибка:1';
+        // ДОБАВЬ ЭТУ СТРОКУ, ЧТОБЫ УВИДЕТЬ ПРИЧИНУ В КОНСОЛИ (F12)
+        console.error("DEBUG CALCULATOR ERROR:", e.message); 
+        
+        display.innerText = 'Ошибка'; 
         errorState = true;
         setTimeout(clearDisplay, 1500);
     }
