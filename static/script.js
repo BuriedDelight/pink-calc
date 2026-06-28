@@ -310,7 +310,7 @@ function calculate() {
         addHistoryItem(textForScreen, formattedResult); 
         display.innerText = formattedResult;
     } catch (e) {
-        display.innerText = 'Ошибка';
+        display.innerText = 'Ошибка:1';
         errorState = true;
         setTimeout(clearDisplay, 1500);
     }
