@@ -1,19 +1,21 @@
 // 1. Инициализация Токена
 let jwtToken = localStorage.getItem('calc_jwt_token');
 
-// ВАЖНО: Объявляем переменные ДО использования в других функциях!
-const display = document.getElementById('display');
-const historyDiv = document.getElementById('history');
-const historyModal = document.getElementById('historyModal');
-const modalHistoryList = document.getElementById('modalHistoryList');
+// ВАЖНО: Объявляем переменные, но не ищем их в DOM сразу
+let display, historyDiv, historyModal, modalHistoryList;
 let errorState = false;
 
 // Обновляем кнопку в шапке при старте
 document.addEventListener('DOMContentLoaded', () => {
+    // ТЕПЕРЬ ищем элементы только когда HTML готов
+    display = document.getElementById('display');
+    historyDiv = document.getElementById('history');
+    historyModal = document.getElementById('historyModal');
+    modalHistoryList = document.getElementById('modalHistoryList');
+
     updateAuthButton();
     loadHistory();
 });
-
 // 2. Вспомогательная функция для заголовков (Теперь с Bearer токеном)
 function getHeaders() {
     const headers = { 'Content-Type': 'application/json' };
