@@ -13,7 +13,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	_ "github.com/lib/pq"
-)пше 
+)
 
 var db *sql.DB
 
