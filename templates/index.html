@@ -65,5 +65,33 @@
         </div>
     </div>
     <script src="/static/script.js"></script>
+
+    <button id="authBtn" onclick="toggleAuthModal()" class="auth-toggle-btn">Войти</button>
+
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-body auth-modal-body">
+            
+            <div class="auth-tabs">
+                <button id="tabLogin" class="active" onclick="switchAuthTab('login')">Вход</button>
+                <button id="tabRegister" onclick="switchAuthTab('register')">Регистрация</button>
+            </div>
+
+            <div id="loginForm" class="auth-form">
+                <input type="text" id="loginUsername" placeholder="Имя пользователя (Логин)">
+                <input type="password" id="loginPassword" placeholder="Пароль">
+                <button onclick="loginUser()">Войти</button>
+                <div id="loginError" class="auth-error"></div>
+            </div>
+
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <input type="text" id="regUsername" placeholder="Придумайте логин">
+                <input type="password" id="regPassword" placeholder="Придумайте пароль">
+                <button onclick="registerUser()">Создать аккаунт</button>
+                <div id="regError" class="auth-error"></div>
+            </div>
+
+            <button class="close-auth" onclick="toggleAuthModal()">Отмена</button>
+        </div>
+    </div>
 </body>
 </html>

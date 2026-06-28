@@ -1,36 +1,42 @@
-// 1. Инициализация ID клиента
-let clientId = localStorage.getItem('calc_client_id');
-if (!clientId) {
-    clientId = 'user_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('calc_client_id', clientId);
-}
+// 1. Инициализация Токена (Убрали старый client_id)
+let jwtToken = localStorage.getItem('calc_jwt_token');
 
-// 2. Вспомогательная функция для заголовков
-function getHeaders() {
-    return { 
-        'Content-Type': 'application/json', 
-        'X-Client-ID': clientId 
-    };
-}
-
-const display = document.getElementById('display');
-const historyDiv = document.getElementById('history');
-const historyModal = document.getElementById('historyModal');
-const modalHistoryList = document.getElementById('modalHistoryList');
-let errorState = false;
-
-// 3. Загрузка истории при старте
+// Обновляем кнопку в шапке при старте
 document.addEventListener('DOMContentLoaded', () => {
+    updateAuthButton();
+    loadHistory();
+});
+
+// 2. Вспомогательная функция для заголовков (Теперь с Bearer токеном)
+function getHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    if (jwtToken) {
+        headers['Authorization'] = 'Bearer ' + jwtToken;
+    }
+    return headers;
+}
+
+// 3. Загрузка истории
+function loadHistory() {
+    historyDiv.innerHTML = ''; 
+    if (!jwtToken) {
+        historyDiv.innerHTML = '<div style="text-align: center; color: #f48fb1; margin-top: 20px;">Войдите, чтобы сохранить историю</div>';
+        return;
+    }
+
     fetch('/api/history', { headers: getHeaders() })
-        .then(response => response.json())
+        .then(response => {
+            if (response.status === 401) {
+                // Токен просрочен
+                logout();
+                throw new Error("Необходима авторизация");
+            }
+            return response.json();
+        })
         .then(data => {
-            console.log("Данные с сервера:", data);
-            historyDiv.innerHTML = ''; 
             if (data && data.length > 0) {
                 data.forEach(item => {
-                    // Форматируем дату, пришедшую с бэкенда (из поля created_at)
                     const dateTimeStr = formatDateTime(item.created_at);
-                    
                     historyDiv.innerHTML += `
                         <div class="history-item">
                             <div class="history-date">${dateTimeStr}</div>
@@ -38,10 +44,125 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>`;
                 });
                 scrollToBottom();
+            } else {
+                historyDiv.innerHTML = '<div style="text-align: center; color: #f48fb1; margin-top: 20px;">История пуста</div>';
             }
         })
         .catch(err => console.error("Ошибка загрузки истории:", err));
-});
+}
+
+// ================= Окно Авторизации =================
+
+const authModal = document.getElementById('authModal');
+
+function toggleAuthModal() {
+    if (jwtToken) {
+        // Если уже авторизован — кнопка работает как "Выход"
+        logout();
+        return;
+    }
+    
+    if (authModal.classList.contains('active')) {
+        authModal.classList.remove('active');
+    } else {
+        authModal.classList.add('active');
+        // Очищаем поля
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginError').innerText = '';
+        document.getElementById('regError').innerText = '';
+    }
+}
+
+function switchAuthTab(tab) {
+    document.getElementById('tabLogin').classList.remove('active');
+    document.getElementById('tabRegister').classList.remove('active');
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'none';
+
+    if (tab === 'login') {
+        document.getElementById('tabLogin').classList.add('active');
+        document.getElementById('loginForm').style.display = 'block';
+    } else {
+        document.getElementById('tabRegister').classList.add('active');
+        document.getElementById('registerForm').style.display = 'block';
+    }
+}
+
+function updateAuthButton() {
+    const btn = document.getElementById('authBtn');
+    if (btn) {
+        btn.innerText = jwtToken ? 'Выйти' : 'Войти';
+    }
+}
+
+function logout() {
+    jwtToken = null;
+    localStorage.removeItem('calc_jwt_token');
+    updateAuthButton();
+    loadHistory(); // Очистит экран истории
+}
+
+// Регистрация
+function registerUser() {
+    const user = document.getElementById('regUsername').value;
+    const pass = document.getElementById('regPassword').value;
+    const errDiv = document.getElementById('regError');
+    
+    if (!user || !pass) {
+        errDiv.innerText = "Заполните все поля";
+        return;
+    }
+
+    fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+    }).then(res => {
+        if (res.ok) {
+            // Успешная регистрация -> сразу логиним
+            document.getElementById('loginUsername').value = user;
+            document.getElementById('loginPassword').value = pass;
+            switchAuthTab('login');
+            loginUser(); 
+        } else {
+            errDiv.innerText = "Пользователь уже существует";
+        }
+    }).catch(() => errDiv.innerText = "Ошибка сервера");
+}
+
+// Вход
+function loginUser() {
+    const user = document.getElementById('loginUsername').value;
+    const pass = document.getElementById('loginPassword').value;
+    const errDiv = document.getElementById('loginError');
+
+    if (!user || !pass) {
+        errDiv.innerText = "Заполните все поля";
+        return;
+    }
+
+    fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Неверный логин или пароль");
+        return res.json();
+    })
+    .then(data => {
+        if (data.token) {
+            jwtToken = data.token;
+            localStorage.setItem('calc_jwt_token', jwtToken);
+            authModal.classList.remove('active');
+            updateAuthButton();
+            loadHistory(); // Загружаем историю из БД!
+        }
+    })
+    .catch(err => errDiv.innerText = err.message);
+}
+
 
 // 4. Функция открытия/закрытия модального окна
 function toggleModal() {
