@@ -1,5 +1,12 @@
-// 1. Инициализация Токена (Убрали старый client_id)
+// 1. Инициализация Токена
 let jwtToken = localStorage.getItem('calc_jwt_token');
+
+// ВАЖНО: Объявляем переменные ДО использования в других функциях!
+const display = document.getElementById('display');
+const historyDiv = document.getElementById('history');
+const historyModal = document.getElementById('historyModal');
+const modalHistoryList = document.getElementById('modalHistoryList');
+let errorState = false;
 
 // Обновляем кнопку в шапке при старте
 document.addEventListener('DOMContentLoaded', () => {
