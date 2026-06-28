@@ -295,7 +295,12 @@ button:active {
     color: white;
     border: none;
     padding: 8px 15px;
+    
+    /* Сбрасываем стили круглых кнопок */
+    aspect-ratio: auto;
+    font-size: 16px;
     border-radius: 20px;
+    
     font-family: 'Fredoka', sans-serif;
     font-weight: 500;
     box-shadow: 0 4px 6px rgba(240, 98, 146, 0.3);
@@ -319,8 +324,13 @@ button:active {
     background: none;
     border: none;
     border-bottom: 2px solid #f8bbd0;
-    font-family: 'Fredoka', sans-serif;
+    
+    /* Сбрасываем стили */
+    aspect-ratio: auto;
+    border-radius: 0;
     font-size: 16px;
+    
+    font-family: 'Fredoka', sans-serif;
     color: #a0a0a0;
     cursor: pointer;
     transition: all 0.3s;
@@ -356,14 +366,17 @@ button:active {
     background: #f06292;
     color: white;
     border: none;
+    
+    /* Сбрасываем стили */
+    aspect-ratio: auto;
     border-radius: 12px;
     font-size: 18px;
+    
     font-family: 'Fredoka', sans-serif;
     font-weight: 500;
     box-shadow: 0 4px 6px rgba(240, 98, 146, 0.3);
     cursor: pointer;
 }
-
 .auth-form button:active {
     transform: scale(0.98);
 }
@@ -373,7 +386,12 @@ button:active {
     background: transparent;
     color: #888;
     border: none;
+    
+    /* Сбрасываем стили */
+    aspect-ratio: auto;
+    border-radius: 0;
     font-size: 14px;
+    
     font-family: 'Fredoka', sans-serif;
     cursor: pointer;
 }

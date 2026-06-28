@@ -188,12 +188,11 @@ function formatDateTime(dateStr) {
 
 // Функция для добавления пробелов между тысячами
 function formatWithSpaces(str) {
-    // Сначала убираем все пробелы
-    let cleanStr = str.replace(/\s/g, '');
+    // Удаляем любые пробелы и неразрывные пробелы (\u00A0)
+    let cleanStr = str.replace(/[\s\u00A0]/g, '');
     
     return cleanStr.replace(/\d+(\.\d+)?/g, function(match) {
         let parts = match.split('.');
-        // ВАЖНО: заменяем " " на "\u00A0" (неразрывный пробел)
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0"); 
         return parts.join('.');
     });
@@ -212,25 +211,23 @@ function clearDisplay() {
 function deleteLast() {
     if (errorState) return clearDisplay();
     
-    // Берем текст и очищаем его от пробелов перед удалением символа
-    let current = display.innerText.replace(/\s/g, '');
+    // Обновленное регулярное выражение
+    let current = display.innerText.replace(/[\s\u00A0]/g, '');
     current = current.slice(0, -1);
     
     if (current === '') {
         display.innerText = '0';
     } else {
-        // Возвращаем на экран с пробелами
         display.innerText = formatWithSpaces(current);
     }
-
     display.scrollLeft = display.scrollWidth;
 }
 
 function appendValue(value) {
     if (errorState) clearDisplay();
     
-    // Работаем с "чистой" строкой без пробелов
-    let current = display.innerText.replace(/\s/g, '');
+    // Обновленное регулярное выражение
+    let current = display.innerText.replace(/[\s\u00A0]/g, '');
     
     if (current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
         current = value;
@@ -238,9 +235,7 @@ function appendValue(value) {
         current += value;
     }
     
-    // Обновляем экран красивым текстом
     display.innerText = formatWithSpaces(current);
-
     display.scrollLeft = display.scrollWidth;
 }
 
@@ -275,7 +270,10 @@ function addHistoryItem(expression, result) {
 function calculate() {
     try {
         const textForScreen = display.innerText; 
-        const originalText = display.innerText.replace(/\s/g, '');
+        
+        // ВАЖНО: Обновленное регулярное выражение здесь!
+        const originalText = display.innerText.replace(/[\s\u00A0]/g, '');
+        
         let expression = originalText.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
         
         expression = expression.replace(/(\d|\)|%)\s*\(/g, '$1*(');
@@ -298,19 +296,14 @@ function calculate() {
         
         if (!isFinite(result) || isNaN(result)) throw new Error("Math Error");
         
-        // Форматируем результат для красоты
         let formattedResult = formatWithSpaces(result.toString());
-        
-        // В историю передаем красивый текст и красивый результат
         addHistoryItem(textForScreen, formattedResult); 
-        
         display.innerText = formattedResult;
     } catch (e) {
         display.innerText = 'Ошибка';
         errorState = true;
         setTimeout(clearDisplay, 1500);
     }
-
     display.scrollLeft = display.scrollWidth;
 }
 
