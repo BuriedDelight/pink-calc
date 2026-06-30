@@ -215,8 +215,14 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
 
 	} else if r.Method == http.MethodGet {
-		rows, err := db.Query("SELECT expression, result, created_at FROM history WHERE user_id = $1 ORDER BY created_at ASC LIMIT 20",
-			userID)
+		rows, err := db.Query(`
+			SELECT expression, result, created_at FROM (
+				SELECT expression, result, created_at
+				FROM history
+				WHERE user_id = $1
+				ORDER BY created_at DESC
+			) sub
+			ORDER BY created_at ASC`, userID)
 		if err != nil {
 			http.Error(w, "Ошибка получения данных", http.StatusInternalServerError)
 			log.Printf("Ошибка SELECT: %v", err)
