@@ -309,8 +309,8 @@ button:active {
     background: #f06292;
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 20px;
+    padding: 8px 24px; 
+    border-radius: 10px;
     font-family: 'Fredoka', sans-serif;
     font-size: 14px;
     font-weight: 500;
