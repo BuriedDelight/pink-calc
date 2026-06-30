@@ -1,7 +1,33 @@
+/* ─── Переменные ────────────────────────────────────────────────────────────── */
+:root {
+    /* Фоны */
+    --bg-body:          #ffe4e1;
+    --bg-calc:          #fce4ec;
+
+    /* Розовая палитра — от тёмного к светлому */
+    --pink-dark:        #880e4f;   /* текст на светлых кнопках */
+    --pink-main:        #e91e63;   /* каретка, база для теней */
+    --pink-accent:      #f48fb1;   /* кнопки действий, скроллбар, дата истории */
+    --pink-light:       #f8bbd0;   /* кнопки цифр, рамки, разделители */
+
+    /* Нейтральные */
+    --text-input:       #333;
+    --text-muted:       #888;
+    --text-inactive:    #a0a0a0;
+    --color-error:      #da1529;
+
+    /* Тени (rgba-версии основных цветов) */
+    --shadow-calc:      rgba(233, 30,  99,  0.30);
+    --shadow-modal:     rgba(233, 30,  99,  0.15);
+    --shadow-btn:       rgba(240, 98,  146, 0.30);
+    --shadow-pulse:     rgba(194, 24,  91,  0.35);
+}
+
+/* ─── Базовые стили ─────────────────────────────────────────────────────────── */
 html, body {
     margin: 0;
     padding: 0;
-    background-color: #ffe4e1;
+    background-color: var(--bg-body);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,44 +38,40 @@ html, body {
     overscroll-behavior-y: none;
 }
 
+/* ─── Калькулятор ───────────────────────────────────────────────────────────── */
 .calculator {
     width: 100%;
     max-width: 400px;
-    background-color: #fce4ec;
-    height: 100vh; /*  fallback для очень старых браузеров */
-    height: 100dvh; 
+    background-color: var(--bg-calc);
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 10px 40px rgba(233, 30, 99, 0.3);
+    box-shadow: 0 10px 40px var(--shadow-calc);
     padding: 20px;
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
 }
 
-
-/* Специально для мобильных экранов (захватываем ВСЕ iPhone) */
+/* ─── Мобильные устройства ──────────────────────────────────────────────────── */
 @media (max-width: 500px) {
     .calculator {
-        max-width: 100%; 
-        width: 100vw; 
-        
+        max-width: 100%;
+        width: 100vw;
         padding-top: calc(2px + env(safe-area-inset-top));
         padding-left: 14px;
-        padding-right: 14px; 
+        padding-right: 14px;
         padding-bottom: calc(20px + env(safe-area-inset-bottom));
-        
-        border-radius: 0; 
+        border-radius: 0;
     }
 
-    /* Экран растягивается и забирает всё свободное место */
     .screen {
         flex: 1 1 auto;
         height: auto;
         min-height: 0;
     }
 
-    /* Кнопки прижимаются к низу с небольшим отступом */
     .buttons {
         flex: 0 0 auto;
         gap: 8px;
@@ -58,44 +80,45 @@ html, body {
     }
 }
 
+/* ─── Шапка ─────────────────────────────────────────────────────────────────── */
 .header-container {
     display: flex;
-    flex-direction: row; /* Выстраиваем элементы в строку */
-    justify-content: space-between; /* Логотип прилипнет влево, кнопка — вправо */
-    align-items: center; /* Выравниваем их по центру по вертикали */
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     flex: 0 0 auto;
-    width: 100%; /* Обязательно на всю ширину */
+    width: 100%;
 }
-/* Контейнер для кнопок в шапке */
+
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 10px; /* Расстояние между кнопкой Входа и историей */
+    gap: 10px;
     margin-right: 5px;
 }
 
 .logo {
     font-size: 2rem;
-    color: #d81b60;
+    color: var(--pink-main);
     font-weight: 1000;
     letter-spacing: 0.5px;
     padding-left: 8px;
 }
 
+/* ─── Кнопка истории ────────────────────────────────────────────────────────── */
 .btn-history-icon {
     background: none;
     border: none;
-    color: #ec4881;
+    color: var(--pink-accent);
     cursor: pointer;
-    padding: 0px;
-    width: 40px;      /* задаём размер самой кнопки */
+    padding: 0;
+    width: 40px;
     height: 40px;
-    margin: 0; /* Сбрасываем старые кривые отступы */
+    margin: 0;
     transition: transform 0.2s;
     display: flex;
     align-items: center;
-    -webkit-tap-highlight-color: transparent; /* Убирает серый квадрат при тапе на iOS */
-
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn-history-icon:active {
@@ -103,40 +126,36 @@ html, body {
 }
 
 .btn-history-icon svg {
-    width: 100%;       /* SVG подстраивается под кнопку */
+    width: 100%;
     height: 100%;
 }
 
+/* ─── Модальное окно (история и авторизация) ────────────────────────────────── */
 .modal-overlay {
     position: absolute;
-    /* Стартуем с середины экрана, а не с самого верха */
-    top: 40%; 
+    top: 40%;
     left: 0;
     width: 100%;
-    /* Высота ровно на половину контейнера */
-    height: 65%; 
+    height: 65%;
     background-color: rgba(252, 228, 236, 0.95);
     z-index: 10;
     display: flex;
     flex-direction: column;
-    /* Убираем окно вниз за пределы экрана */
-    transform: translateY(100%); 
+    transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     padding: 20px;
-    padding-top: 30px; /* Оставляем место под полосочку-ручку */
+    padding-top: 30px;
     box-sizing: border-box;
-    /* Закругляем только верхние углы */
-    border-radius: 30px 30px 0 0; 
-    box-shadow: 0 -5px 25px rgba(233, 30, 99, 0.15);
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -5px 25px var(--shadow-modal);
     min-height: 0;
 }
 
-/* Состояние открытого окна */
 .modal-overlay.active {
-    transform: translateY(0); 
+    transform: translateY(0);
 }
 
-/* Делаем визуальную "ручку" для свайпа как на iOS */
+/* Ручка для свайпа */
 .modal-overlay::before {
     content: '';
     position: absolute;
@@ -145,7 +164,7 @@ html, body {
     transform: translateX(-50%);
     width: 40px;
     height: 5px;
-    background-color: #f8bbd0;
+    background-color: var(--pink-light);
     border-radius: 5px;
 }
 
@@ -153,18 +172,18 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #d81b60;
+    color: var(--pink-main);
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #f8bbd0;
+    border-bottom: 2px solid var(--pink-light);
 }
 
 .modal-close {
     background: none;
     border: none;
-    color: #d81b60;
+    color: var(--pink-main);
     font-size: 2.8rem;
     cursor: pointer;
     line-height: 1;
@@ -175,20 +194,21 @@ html, body {
     overflow-y: auto;
     min-height: 0;
     touch-action: pan-y;
-    -webkit-overflow-scrolling: touch; /* для старых iOS */
-    color: #c2185b;
+    -webkit-overflow-scrolling: touch;
+    color: var(--pink-main);
     font-size: 1.3rem;
     padding-right: 10px;
     scrollbar-width: thin;
-    scrollbar-color: #f48fb1 transparent;
+    scrollbar-color: var(--pink-soft) transparent;
 }
 
 .modal-body .history-item {
     margin-bottom: 15px;
-    border-bottom: 1px dashed #f8bbd0;
+    border-bottom: 1px dashed var(--pink-light);
     padding-bottom: 5px;
 }
 
+/* ─── Экран ─────────────────────────────────────────────────────────────────── */
 .screen {
     flex: none;
     display: flex;
@@ -203,40 +223,40 @@ html, body {
     flex: 1;
     overflow-y: auto;
     text-align: right;
-    color: #f06292;
+    color: var(--pink-accent:);
     font-size: 1rem;
-    padding-bottom: 0px;
+    padding-bottom: 0;
     scrollbar-width: none;
 }
+
 .history::-webkit-scrollbar {
     display: none;
 }
 
-/* Контейнер для одной записи в истории */
 .history-item {
     display: flex;
-    flex-direction: column; /* Выстраиваем дату и вычисление вертикально */
-    align-items: flex-end;   /* Прижимаем всё к правому краю */
-    margin-bottom: 12px;     /* Чуть увеличим отступ между группами записей */
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 12px;
 }
 
-/* Стиль для маленькой даты над примером */
 .history-date {
-    font-size: 0.75rem;      /* Маленький шрифт */
-    color: #f48fb1;          /* Приглушенный розовый цвет, чтобы не отвлекать */
-    margin-bottom: 2px;      /* Отступ до самого вычисления */
+    font-size: 0.75rem;
+    color: var(--pink-soft);
+    margin-bottom: 2px;
     font-weight: 400;
     letter-spacing: 0.3px;
 }
 
-/* Стиль для самого математического выражения (чтобы перебить старый стиль строки) */
 .history-math {
     word-wrap: break-word;
     word-break: break-all;
 }
+
+/* ─── Дисплей ───────────────────────────────────────────────────────────────── */
 @keyframes displayPulse {
     0%   { transform: scale(1);    text-shadow: none; }
-    40%  { transform: scale(1.02); text-shadow: 0 0 18px rgba(194, 24, 91, 0.35); }
+    40%  { transform: scale(1.02); text-shadow: 0 0 18px var(--shadow-pulse); }
     100% { transform: scale(1);    text-shadow: none; }
 }
 
@@ -245,7 +265,7 @@ html, body {
 }
 
 .display {
-    color: #c2185b;
+    color: var(--pink-main);
     text-align: right;
     font-size: 2.5rem;
     font-weight: 500;
@@ -253,23 +273,21 @@ html, body {
     white-space: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
-    
-    caret-color: #e91e63;        /* розовый курсор */
-    outline: none;               /* убираем рамку contenteditable */
+    caret-color: var(--pink-main);
+    outline: none;
     user-select: text;
     -webkit-user-select: text;
 }
 
-/* цвет выделения текста */
 .display::selection {
     background: rgba(233, 30, 99, 0.2);
 }
 
-/* Прячем ползунок скроллбара для Chrome, Safari и iOS */
 .display::-webkit-scrollbar {
-    display: none; 
+    display: none;
 }
 
+/* ─── Кнопки (общие) ────────────────────────────────────────────────────────── */
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -287,19 +305,23 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: filter 0.1s;
     outline: none;
     -webkit-tap-highlight-color: transparent;
     transition: transform 0.08s ease, filter 0.08s ease;
-
-     /* Нужно для ripple */
     position: relative;
     overflow: hidden;
 }
 
+button:active,
+button.pressed {
+    filter: brightness(0.9);
+    transform: scale(0.88);
+}
+
+/* ─── Ripple-эффект ─────────────────────────────────────────────────────────── */
 @keyframes ripple {
-    0%   { transform: scale(0);    opacity: 0.5; }
-    100% { transform: scale(3.5);  opacity: 0; }
+    0%   { transform: scale(0);   opacity: 0.5; }
+    100% { transform: scale(3.5); opacity: 0;   }
 }
 
 .ripple-wave {
@@ -312,29 +334,24 @@ button {
     animation: ripple 0.45s ease-out forwards;
 }
 
-.btn-number   .ripple-wave { background: rgba(99, 11, 58, 0.18); }
-.btn-action   .ripple-wave { background: rgba(83, 6, 47, 0.18); }
-.btn-operator .ripple-wave { background: rgba(255, 255, 255, 0.318);  }
-.btn-equal    .ripple-wave { background: rgba(255, 255, 255, 0.486);  }
+.btn-number   .ripple-wave { background: rgba(136, 14, 79, 0.18); }
+.btn-action   .ripple-wave { background: rgba(136, 14, 79, 0.18); }
+.btn-operator .ripple-wave { background: rgba(255, 255, 255, 0.32); }
+.btn-equal    .ripple-wave { background: rgba(255, 255, 255, 0.49); }
 
-button:active,
-button.pressed {
-    filter: brightness(0.9);
-    transform: scale(0.88);
-}
-
+/* ─── Типы кнопок ───────────────────────────────────────────────────────────── */
 .btn-number {
-    background-color: #f8bbd0;
-    color: #880e4f;
+    background-color: var(--pink-light);
+    color: var(--pink-dark);
 }
 
 .btn-action {
-    background-color: #f48fb1;
-    color: #880e4f;
+    background-color: var(--pink-soft);
+    color: var(--pink-dark);
 }
 
 .btn-operator {
-    background-color: #ec407a;
+    background-color: var(--pink-accent);
     color: white;
     font-size: 2.5rem;
     padding-bottom: 6px;
@@ -343,8 +360,8 @@ button.pressed {
 }
 
 .btn-paren {
-    background-color: #f8bbd0;
-    color: #880e4f;
+    background-color: var(--pink-light);
+    color: var(--pink-dark);
     padding-bottom: 4px;
 }
 
@@ -356,25 +373,23 @@ button.pressed {
     padding-bottom: 21px;
 }
 
+/* ─── Кнопка авторизации ────────────────────────────────────────────────────── */
 .auth-toggle-btn {
-    background: #f06292;
+    background: var(--pink-accent:);
     color: white;
     border: none;
-    padding: 8px 24px; 
-
-    /* явно сбрасываем стили общего button */
+    padding: 8px 24px;
     aspect-ratio: auto;
     border-radius: 20px;
-
     font-family: 'Comfortaa', sans-serif;
     font-size: 14px;
     font-weight: 500;
-    box-shadow: 0 4px 6px rgba(240, 98, 146, 0.3);
+    box-shadow: 0 4px 6px var(--shadow-btn);
     cursor: pointer;
-    white-space: nowrap; /* Чтобы текст не переносился */
+    white-space: nowrap;
 }
 
-/* Стили окна авторизации */
+/* ─── Окно авторизации ──────────────────────────────────────────────────────── */
 .auth-modal-body {
     padding: 25px;
     text-align: center;
@@ -390,22 +405,19 @@ button.pressed {
     padding: 10px;
     background: none;
     border: none;
-    border-bottom: 2px solid #f8bbd0;
-    
-    /* Сбрасываем стили */
+    border-bottom: 2px solid var(--pink-light);
     aspect-ratio: auto;
     border-radius: 0;
     font-size: 16px;
-    
     font-family: 'Fredoka', sans-serif;
-    color: #a0a0a0;
+    color: var(--text-inactive);
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .auth-tabs button.active {
-    border-bottom: 3px solid #f06292;
-    color: #f06292;
+    border-bottom: 3px solid var(--pink-accent:);
+    color: var(--pink-accent:);
     font-weight: 600;
 }
 
@@ -413,37 +425,35 @@ button.pressed {
     width: 100%;
     padding: 15px;
     margin-bottom: 15px;
-    border: 2px solid #f8bbd0;
+    border: 2px solid var(--pink-light);
     border-radius: 12px;
     box-sizing: border-box;
     font-family: 'Fredoka', sans-serif;
     font-size: 16px;
-    color: #333;
+    color: var(--text-input);
     outline: none;
     transition: border 0.3s;
 }
 
 .auth-form input:focus {
-    border-color: #f06292;
+    border-color: var(--pink-accent:);
 }
 
 .auth-form button {
     width: 100%;
     padding: 15px;
-    background: #f06292;
+    background: var(--pink-accent:);
     color: white;
     border: none;
-    
-    /* Сбрасываем стили */
     aspect-ratio: auto;
     border-radius: 12px;
     font-size: 18px;
-    
     font-family: 'Fredoka', sans-serif;
     font-weight: 500;
-    box-shadow: 0 4px 6px rgba(240, 98, 146, 0.3);
+    box-shadow: 0 4px 6px var(--shadow-btn);
     cursor: pointer;
 }
+
 .auth-form button:active {
     transform: scale(0.98);
 }
@@ -451,22 +461,18 @@ button.pressed {
 .close-auth {
     margin-top: 15px;
     background: transparent;
-    color: #888;
+    color: var(--text-muted);
     border: none;
-    
-    /* Сбрасываем стили */
     aspect-ratio: auto;
     border-radius: 0;
     font-size: 14px;
-    
     font-family: 'Fredoka', sans-serif;
     cursor: pointer;
 }
 
 .auth-error {
-    color: #d32f2f;
+    color: var(--color-error);
     font-size: 14px;
     margin-top: 10px;
     min-height: 20px;
 }
-
