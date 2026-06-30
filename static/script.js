@@ -7,7 +7,6 @@ let errorState = false;
 
 // Обновляем кнопку в шапке при старте
 document.addEventListener('DOMContentLoaded', () => {
-    // ТЕПЕРЬ ищем элементы только когда HTML готов
     display = document.getElementById('display');
     historyDiv = document.getElementById('history');
     historyModal = document.getElementById('historyModal');
@@ -15,7 +14,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateAuthButton();
     loadHistory();
+
+    display.addEventListener('paste', e => e.preventDefault());
+
+    // Поддержка физической клавиатуры (десктоп)
+    display.addEventListener('keydown', e => {
+        e.preventDefault();
+        const map = {
+            '0':'0','1':'1','2':'2','3':'3','4':'4',
+            '5':'5','6':'6','7':'7','8':'8','9':'9',
+            '.':'.', '+':'+', '-':'−', '*':'×', '/':'÷', '%':'%'
+        };
+        if (map[e.key])          appendValue(map[e.key]);
+        else if (e.key === 'Backspace') deleteLast();
+        else if (e.key === 'Enter' || e.key === '=') calculate();
+        else if (e.key === 'Escape') clearAll();
+    });
 });
+
+
 // 2. Вспомогательная функция для заголовков (Теперь с Bearer токеном)
 function getHeaders() {
     const headers = { 'Content-Type': 'application/json' };
@@ -215,37 +232,72 @@ function clearAll() {
 function clearDisplay() {
     display.innerText = '0';
     errorState = false;
+    moveCursorToEnd();
 }
 
 function deleteLast() {
     if (errorState) return clearDisplay();
-    
-    // Обновленное регулярное выражение
+
+    const rawPos = getRawCursorPos();
     let current = display.innerText.replace(/[\s\u00A0]/g, '');
-    current = current.slice(0, -1);
-    
+
+    let newRawPos;
+    if (rawPos === null || rawPos >= current.length) {
+        // курсор в конце — удаляем последний символ
+        current = current.slice(0, -1);
+        newRawPos = current.length;
+    } else if (rawPos > 0) {
+        // удаляем символ перед курсором
+        current = current.slice(0, rawPos - 1) + current.slice(rawPos);
+        newRawPos = rawPos - 1;
+    } else {
+        // курсор в самом начале — нечего удалять
+        newRawPos = 0;
+    }
+
     if (current === '') {
         display.innerText = '0';
+        newRawPos = 1;
     } else {
         display.innerText = formatWithSpaces(current);
     }
-    display.scrollLeft = display.scrollWidth;
+
+    setRawCursorPos(newRawPos);
 }
 
 function appendValue(value) {
     if (errorState) clearDisplay();
-    
-    // Обновленное регулярное выражение
+
+    const rawPos = getRawCursorPos();
     let current = display.innerText.replace(/[\s\u00A0]/g, '');
-    
-    if (current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
-        current = value;
+
+    let newRawPos;
+
+    if (rawPos === null || rawPos >= current.length) {
+        // курсор в конце (или не определён)
+        if (current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
+            current = value;
+        } else {
+            current += value;
+        }
+        newRawPos = current.length;
     } else {
-        current += value;
+        // вставляем в позицию курсора
+        const before = current.slice(0, rawPos);
+        const after  = current.slice(rawPos);
+        if (before === '' && current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
+            current = value + after;
+        } else {
+            current = before + value + after;
+        }
+        newRawPos = rawPos + value.length;
     }
-    
+
     display.innerText = formatWithSpaces(current);
-    display.scrollLeft = display.scrollWidth;
+    setRawCursorPos(newRawPos);
+    flashDisplay();
+
+    if (newRawPos >= current.length) display.scrollLeft = display.scrollWidth;
 }
 
 function scrollToBottom() {
@@ -427,3 +479,65 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+
+// Возвращает позицию курсора в «сырой» строке (без NBSP-пробелов)
+function getRawCursorPos() {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+    const range = sel.getRangeAt(0);
+    if (!display.contains(range.startContainer)) return null;
+
+    const formattedPos = range.startOffset;
+    const formatted = display.innerText;
+
+    let rawCount = 0;
+    for (let i = 0; i < formattedPos && i < formatted.length; i++) {
+        if (formatted[i] !== '\u00A0') rawCount++;
+    }
+    return rawCount;
+}
+
+// Ставит курсор на позицию rawPos в сырой строке
+function setRawCursorPos(rawPos) {
+    const formatted = display.innerText;
+    if (!formatted) return;
+
+    let rawCount = 0;
+    let formattedPos = formatted.length; // по умолчанию — в конец
+
+    for (let i = 0; i < formatted.length; i++) {
+        if (rawCount === rawPos) { formattedPos = i; break; }
+        if (formatted[i] !== '\u00A0') rawCount++;
+    }
+
+    const textNode = display.firstChild;
+    if (!textNode) return;
+    try {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.setStart(textNode, Math.min(formattedPos, textNode.length));
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    } catch(e) {}
+}
+
+// Курсор в конец строки
+function moveCursorToEnd() {
+    try {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(display);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    } catch(e) {}
+}
+
+// Анимация пульса при вводе
+function flashDisplay() {
+    display.classList.remove('input-flash');
+    void display.offsetWidth; // принудительный reflow
+    display.classList.add('input-flash');
+}
+

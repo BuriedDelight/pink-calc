@@ -234,6 +234,15 @@ html, body {
     word-wrap: break-word;
     word-break: break-all;
 }
+@keyframes displayPulse {
+    0%   { transform: scale(1);    text-shadow: none; }
+    40%  { transform: scale(1.02); text-shadow: 0 0 18px rgba(194, 24, 91, 0.35); }
+    100% { transform: scale(1);    text-shadow: none; }
+}
+
+.display.input-flash {
+    animation: displayPulse 0.18s ease-out forwards;
+}
 
 .display {
     color: #c2185b;
@@ -241,11 +250,19 @@ html, body {
     font-size: 2.5rem;
     font-weight: 500;
     line-height: 1;
-    
-    /* Новые стили для горизонтального скролла */
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow-x: auto;
-    scrollbar-width: none; /* Прячем скроллбар в Firefox */
+    scrollbar-width: none;
+    
+    caret-color: #e91e63;        /* розовый курсор */
+    outline: none;               /* убираем рамку contenteditable */
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+/* цвет выделения текста */
+.display::selection {
+    background: rgba(233, 30, 99, 0.2);
 }
 
 /* Прячем ползунок скроллбара для Chrome, Safari и iOS */
@@ -428,3 +445,4 @@ button:active {
     margin-top: 10px;
     min-height: 20px;
 }
+
