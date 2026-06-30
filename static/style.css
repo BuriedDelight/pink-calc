@@ -7,12 +7,10 @@
     /* Розовая палитра — от тёмного к светлому */
     --pink-dark:        #880e4f;   /* текст на светлых кнопках */
     --pink-deep:        #d81b60;   /* логотип, заголовки модалок */
-    --pink-mid:         #c2185b;   /* дисплей, текст модалок */
     --pink-main:        #e91e63;   /* каретка, база для теней */
     --pink-accent:      #ec407a;   /* кнопки операторов, иконка истории */
-    --pink-bright:      #f06292;   /* кнопка авторизации, активные табы */
     --pink-soft:        #f48fb1;   /* кнопки действий, скроллбар, дата истории */
-    --pink-light:       #f8bbd0;   /* кнопки цифр, рамки, разделители */
+    --pink-light:       #f6c9d8;   /* кнопки цифр, рамки, разделители */
 
     /* Нейтральные */
     --text-input:       #333;
@@ -199,7 +197,7 @@ html, body {
     min-height: 0;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
-    color: var(--pink-mid);
+    color: var(--pink-deep);
     font-size: 1.3rem;
     padding-right: 10px;
     scrollbar-width: thin;
@@ -227,7 +225,7 @@ html, body {
     flex: 1;
     overflow-y: auto;
     text-align: right;
-    color: var(--pink-bright);
+    color: var(--pink-accent);
     font-size: 1rem;
     padding-bottom: 0;
     scrollbar-width: none;
@@ -269,7 +267,7 @@ html, body {
 }
 
 .display {
-    color: var(--pink-mid);
+    color: var(--pink-deep);
     text-align: right;
     font-size: 2.5rem;
     font-weight: 500;
@@ -379,7 +377,7 @@ button.pressed {
 
 /* ─── Кнопка авторизации ────────────────────────────────────────────────────── */
 .auth-toggle-btn {
-    background: var(--pink-bright);
+    background: var(--pink-accent);
     color: white;
     border: none;
     padding: 8px 24px;
@@ -420,8 +418,8 @@ button.pressed {
 }
 
 .auth-tabs button.active {
-    border-bottom: 3px solid var(--pink-bright);
-    color: var(--pink-bright);
+    border-bottom: 3px solid var(--pink-accent);
+    color: var(--pink-accent);
     font-weight: 600;
 }
 
@@ -440,13 +438,13 @@ button.pressed {
 }
 
 .auth-form input:focus {
-    border-color: var(--pink-bright);
+    border-color: var(--pink-accent);
 }
 
 .auth-form button {
     width: 100%;
     padding: 15px;
-    background: var(--pink-bright);
+    background: var(--pink-accent);
     color: white;
     border: none;
     aspect-ratio: auto;
