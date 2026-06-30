@@ -4,8 +4,9 @@
   "description": "Barbie калькулятор.",
   "start_url": "https://calc4barbie.stilldrive.ru/",
   "display": "fullscreen",
-  "background_color": "#ffc0cb",
-  "theme_color": "#ffc0cb",
+  "theme_color": "#fce4ec",
+  "background_color": "#fce4ec",
+
   "icons": [
     {
       "src": "/static/icon.png",
