@@ -88,7 +88,8 @@ html, body {
     color: #ec4881;
     cursor: pointer;
     padding: 0px;
-    
+    width: 40px;      /* задаём размер самой кнопки */
+    height: 40px;
     margin: 0; /* Сбрасываем старые кривые отступы */
     margin-right: 0px;
     margin-top: 10px;
@@ -96,10 +97,16 @@ html, body {
     display: flex;
     align-items: center;
     -webkit-tap-highlight-color: transparent; /* Убирает серый квадрат при тапе на iOS */
+
 }
 
 .btn-history-icon:active {
     transform: scale(0.7);
+}
+
+.btn-history-icon svg {
+    width: 100%;       /* SVG подстраивается под кнопку */
+    height: 100%;
 }
 
 .modal-overlay {
@@ -310,13 +317,18 @@ button:active {
     color: white;
     border: none;
     padding: 8px 24px; 
-    border-radius: 10px;
+
+    /* явно сбрасываем стили общего button */
+    aspect-ratio: auto;
+    border-radius: 20px;
+    
     font-family: 'Fredoka', sans-serif;
     font-size: 14px;
     font-weight: 500;
     box-shadow: 0 4px 6px rgba(240, 98, 146, 0.3);
     cursor: pointer;
     white-space: nowrap; /* Чтобы текст не переносился */
+
 }
 
 /* Стили окна авторизации */
