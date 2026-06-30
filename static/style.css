@@ -42,8 +42,8 @@ html, body {
         border-radius: 0; 
     }
 
-    /* Экран истории растягивается и забирает всё свободное место */
-    .display {
+    /* Экран растягивается и забирает всё свободное место */
+    .screen {
         flex: 1 1 auto;
         height: auto;
         min-height: 0;
@@ -189,7 +189,7 @@ html, body {
     justify-content: flex-end;
     margin-bottom: 20px;
     margin-top: 10px;
-    height: 150px;
+    height: 180px;
 }
 
 .history {
