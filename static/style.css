@@ -36,7 +36,7 @@ html, body {
         
         padding-top: calc(2px + env(safe-area-inset-top));
         padding-left: 5px;
-        padding-right: 5px; 
+        padding-right: 10px; 
         padding-bottom: calc(24px + env(safe-area-inset-bottom));
         
         border-radius: 0; 
