@@ -21,9 +21,8 @@
   ],
   "orientation": "portrait",
   "display_override": [
-    "fullscreen",
-    "minimal-ui",
-    "window-controls-overlay"
+    "standalone",
+    "minimal-ui"
   ],
   "iarc_rating_id": "0"
 }

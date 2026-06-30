@@ -5,8 +5,8 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 50vh;
-    min-height: 50dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
     font-family: 'Fredoka', sans-serif;
     touch-action: manipulation;
     overscroll-behavior-y: none;
