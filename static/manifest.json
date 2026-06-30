@@ -3,7 +3,7 @@
   "short_name": "BarbieCalc",
   "description": "Barbie калькулятор.",
   "start_url": "https://calc4barbie.stilldrive.ru/",
-  "display": "fullscreen",
+  "display": "standalone",
   "theme_color": "#fce4ec",
   "background_color": "#fce4ec",
 
