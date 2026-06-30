@@ -275,10 +275,13 @@ button {
     transition: filter 0.1s;
     outline: none;
     -webkit-tap-highlight-color: transparent;
+    transition: transform 0.08s ease, filter 0.08s ease;
 }
 
 button:active {
-    filter: brightness(0.8);
+    filter: brightness(0.9);
+    transform: scale(0.82);
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-number {
@@ -324,7 +327,7 @@ button:active {
     aspect-ratio: auto;
     border-radius: 20px;
 
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comfortaa', sans-serif;
     font-size: 14px;
     font-weight: 500;
     box-shadow: 0 4px 6px rgba(240, 98, 146, 0.3);
