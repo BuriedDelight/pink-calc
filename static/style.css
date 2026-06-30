@@ -8,7 +8,7 @@
     --pink-dark:        #880e4f;   /* текст на светлых кнопках */
     --pink-main:        #e91e63;   /* каретка, база для теней */
     --pink-accent:      #f48fb1;   /* кнопки действий, скроллбар, дата истории */
-    --pink-light:       #f8bbd0;   /* кнопки цифр, рамки, разделители */
+    --pink-light:       #f1dce4;   /* кнопки цифр, рамки, разделители */
 
     /* Нейтральные */
     --text-input:       #333;
@@ -346,7 +346,7 @@ button.pressed {
 }
 
 .btn-action {
-    background-color: var(--pink-main);
+    background-color: var(--pink-dark);
     color: var(--pink-light);
 }
 
