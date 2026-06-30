@@ -112,7 +112,7 @@ html, body {
 .modal-overlay {
     position: absolute;
     /* Стартуем с середины экрана, а не с самого верха */
-    top: 60%; 
+    top: 40%; 
     left: 0;
     width: 100%;
     /* Высота ровно на половину контейнера */
@@ -176,6 +176,8 @@ html, body {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch; /* для старых iOS */
     color: #c2185b;
     font-size: 1.3rem;
     padding-right: 10px;
@@ -321,7 +323,7 @@ button:active {
     /* явно сбрасываем стили общего button */
     aspect-ratio: auto;
     border-radius: 20px;
-    
+
     font-family: 'Fredoka', sans-serif;
     font-size: 14px;
     font-weight: 500;

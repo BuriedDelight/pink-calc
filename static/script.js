@@ -329,8 +329,33 @@ function calculate() {
     display.scrollLeft = display.scrollWidth;
 }
 
-const modal = document.querySelector('.modal-overlay');
-const modalBody = document.querySelector('.modal-body'); // Контейнер с историей
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+    let startY = 0, currentY = 0, isDragging = false;
+
+    modal.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.modal-body')) return;
+        startY = e.touches[0].clientY;
+        isDragging = true;
+        modal.style.transition = 'none';
+    }, { passive: true });
+
+    modal.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        currentY = e.touches[0].clientY;
+        const deltaY = currentY - startY;
+        if (deltaY > 0) modal.style.transform = `translateY(${deltaY}px)`;
+    }, { passive: false });
+
+    modal.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        modal.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+        const deltaY = currentY - startY;
+        if (deltaY > 100) modal.classList.remove('active');
+        modal.style.transform = '';
+    });
+});
 
 let startY = 0;
 let currentY = 0;
