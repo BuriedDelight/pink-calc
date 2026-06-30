@@ -346,13 +346,13 @@ button.pressed {
 }
 
 .btn-action {
-    background-color: var(--pink-soft);
-    color: var(--pink-dark);
+    background-color: var(--pink-dark);
+    color: var(--pink-soft);
 }
 
 .btn-operator {
     background-color: var(--pink-accent);
-    color: white;
+    color: var(-pink-dark);
     font-size: 2.5rem;
     padding-bottom: 6px;
     box-sizing: border-box;
