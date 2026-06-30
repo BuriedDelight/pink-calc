@@ -290,12 +290,36 @@ button {
     transition: filter 0.1s;
     outline: none;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.08s ease, filter 0.08s ease, box-shadow 0.08s ease;
+    transition: transform 0.08s ease, filter 0.08s ease;
+
+     /* Нужно для ripple */
+    position: relative;
+    overflow: hidden;
 }
+
+@keyframes ripple {
+    0%   { transform: scale(0);    opacity: 0.5; }
+    100% { transform: scale(3.5);  opacity: 0; }
+}
+
+.ripple-wave {
+    position: absolute;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    pointer-events: none;
+    transform: scale(0);
+    animation: ripple 0.45s ease-out forwards;
+}
+
+.btn-number   .ripple-wave { background: rgba(136, 14,  79,  0.18); }
+.btn-action   .ripple-wave { background: rgba(136, 14,  79,  0.18); }
+.btn-operator .ripple-wave { background: rgba(255, 255, 255, 0.3);  }
+.btn-equal    .ripple-wave { background: rgba(255, 255, 255, 0.3);  }
 
 button:active {
     filter: brightness(0.9);
-    transform: scale(0.92);
+    transform: scale(0.88);
 }
 
 .btn-number {
