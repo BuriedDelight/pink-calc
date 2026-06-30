@@ -290,13 +290,12 @@ button {
     transition: filter 0.1s;
     outline: none;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.08s ease, filter 0.08s ease;
+    transition: transform 0.08s ease, filter 0.08s ease, box-shadow 0.08s ease;
 }
 
 button:active {
     filter: brightness(0.9);
     transform: scale(0.92);
-    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-number {

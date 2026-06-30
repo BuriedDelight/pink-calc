@@ -537,7 +537,9 @@ function moveCursorToEnd() {
 // Анимация пульса при вводе
 function flashDisplay() {
     display.classList.remove('input-flash');
-    void display.offsetWidth; // принудительный reflow
-    display.classList.add('input-flash');
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            display.classList.add('input-flash');
+        });
+    });
 }
-
