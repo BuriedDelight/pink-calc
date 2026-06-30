@@ -7,7 +7,8 @@ const urlsToCache = [
     '/static/script.js',
     '/static/icon.png',
     '/static/manifest.json',
-    'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap' // Шрифты тоже кэшируем!
+    'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap',
+    'https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap'
 ];
 
 // 1. При установке кэшируем все нужные файлы

@@ -6,6 +6,7 @@
   "display": "standalone",
   "theme_color": "#fce4ec",
   "background_color": "#fce4ec",
+  "scope": "https://calc4barbie.stilldrive.ru/",
 
   "icons": [
     {
