@@ -314,8 +314,8 @@ button {
 
 .btn-number   .ripple-wave { background: rgba(99, 11, 58, 0.18); }
 .btn-action   .ripple-wave { background: rgba(83, 6, 47, 0.18); }
-.btn-operator .ripple-wave { background: rgba(255, 255, 255, 0.216);  }
-.btn-equal    .ripple-wave { background: rgba(255, 255, 255, 0.122);  }
+.btn-operator .ripple-wave { background: rgba(255, 255, 255, 0.318);  }
+.btn-equal    .ripple-wave { background: rgba(255, 255, 255, 0.486);  }
 
 button:active {
     filter: brightness(0.9);
