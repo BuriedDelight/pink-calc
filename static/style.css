@@ -6,15 +6,19 @@
 
     /* Розовая палитра — от тёмного к светлому */
     --pink-dark:        #880e4f;   /* текст на светлых кнопках */
+    --pink-deep:        #d81b60;   /* логотип, заголовки модалок */
+    --pink-mid:         #c2185b;   /* дисплей, текст модалок */
     --pink-main:        #e91e63;   /* каретка, база для теней */
-    --pink-accent:      #f48fb1;   /* кнопки действий, скроллбар, дата истории */
-    --pink-light:       #f1dce4;   /* кнопки цифр, рамки, разделители */
+    --pink-accent:      #ec407a;   /* кнопки операторов, иконка истории */
+    --pink-bright:      #f06292;   /* кнопка авторизации, активные табы */
+    --pink-soft:        #f48fb1;   /* кнопки действий, скроллбар, дата истории */
+    --pink-light:       #f8bbd0;   /* кнопки цифр, рамки, разделители */
 
     /* Нейтральные */
     --text-input:       #333;
     --text-muted:       #888;
     --text-inactive:    #a0a0a0;
-    --color-error:      #da1529;
+    --color-error:      #d32f2f;
 
     /* Тени (rgba-версии основных цветов) */
     --shadow-calc:      rgba(233, 30,  99,  0.30);
@@ -99,7 +103,7 @@ html, body {
 
 .logo {
     font-size: 2rem;
-    color: var(--pink-main);
+    color: var(--pink-deep);
     font-weight: 1000;
     letter-spacing: 0.5px;
     padding-left: 8px;
@@ -172,7 +176,7 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--pink-main);
+    color: var(--pink-deep);
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 20px;
@@ -183,7 +187,7 @@ html, body {
 .modal-close {
     background: none;
     border: none;
-    color: var(--pink-main);
+    color: var(--pink-deep);
     font-size: 2.8rem;
     cursor: pointer;
     line-height: 1;
@@ -195,11 +199,11 @@ html, body {
     min-height: 0;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
-    color: var(--pink-main);
+    color: var(--pink-mid);
     font-size: 1.3rem;
     padding-right: 10px;
     scrollbar-width: thin;
-    scrollbar-color: var(--pink-light) transparent;
+    scrollbar-color: var(--pink-soft) transparent;
 }
 
 .modal-body .history-item {
@@ -223,7 +227,7 @@ html, body {
     flex: 1;
     overflow-y: auto;
     text-align: right;
-    color: var(--pink-accent);
+    color: var(--pink-bright);
     font-size: 1rem;
     padding-bottom: 0;
     scrollbar-width: none;
@@ -242,7 +246,7 @@ html, body {
 
 .history-date {
     font-size: 0.75rem;
-    color: var(--pink-light);
+    color: var(--pink-soft);
     margin-bottom: 2px;
     font-weight: 400;
     letter-spacing: 0.3px;
@@ -265,7 +269,7 @@ html, body {
 }
 
 .display {
-    color: var(--pink-main);
+    color: var(--pink-mid);
     text-align: right;
     font-size: 2.5rem;
     font-weight: 500;
@@ -346,13 +350,13 @@ button.pressed {
 }
 
 .btn-action {
-    background-color: var(--pink-dark);
-    color: var(--pink-light);
+    background-color: var(--pink-soft);
+    color: var(--pink-dark);
 }
 
 .btn-operator {
     background-color: var(--pink-accent);
-    color: var(--pink-light);
+    color: white;
     font-size: 2.5rem;
     padding-bottom: 6px;
     box-sizing: border-box;
@@ -375,8 +379,8 @@ button.pressed {
 
 /* ─── Кнопка авторизации ────────────────────────────────────────────────────── */
 .auth-toggle-btn {
-    background: var(--pink-accent);
-    color: var(--pink-light);
+    background: var(--pink-bright);
+    color: white;
     border: none;
     padding: 8px 24px;
     aspect-ratio: auto;
@@ -416,8 +420,8 @@ button.pressed {
 }
 
 .auth-tabs button.active {
-    border-bottom: 3px solid var(--pink-accent);
-    color: var(--pink-accent);
+    border-bottom: 3px solid var(--pink-bright);
+    color: var(--pink-bright);
     font-weight: 600;
 }
 
@@ -436,14 +440,14 @@ button.pressed {
 }
 
 .auth-form input:focus {
-    border-color: var(--pink-accent);
+    border-color: var(--pink-bright);
 }
 
 .auth-form button {
     width: 100%;
     padding: 15px;
-    background: var(--pink-accent);
-    color: var(--pink-light);
+    background: var(--pink-bright);
+    color: white;
     border: none;
     aspect-ratio: auto;
     border-radius: 12px;
