@@ -5,6 +5,53 @@ let jwtToken = localStorage.getItem('calc_jwt_token');
 let display, historyDiv, historyModal, modalHistoryList;
 let errorState = false;
 
+function createRipple(e) {
+    const btn = e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+
+    // Координаты касания внутри кнопки
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left - 30;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top  - 30;
+
+    const wave = document.createElement('span');
+    wave.classList.add('ripple-wave');
+    wave.style.left = x + 'px';
+    wave.style.top  = y + 'px';
+
+    btn.appendChild(wave);
+    wave.addEventListener('animationend', () => wave.remove());
+}
+
+// Обновляем кнопку в шапке при старте
+document.addEventListener('DOMContentLoaded', () => {
+    display = document.getElementById('display');
+    historyDiv = document.getElementById('history');
+    historyModal = document.getElementById('historyModal');
+    modalHistoryList = document.getElementById('modalHistoryList');
+    document.querySelectorAll('.btn-number, .btn-action, .btn-operator, .btn-equal')
+    .forEach(btn => {
+        btn.addEventListener('touchstart', createRipple, { passive: true });
+        btn.addEventListener('mousedown',  createRipple);
+    });
+    updateAuthButton();
+    loadHistory();
+
+    display.addEventListener('paste', e => e.preventDefault());
+
+    // Поддержка физической клавиатуры (десктоп)
+    display.addEventListener('keydown', e => {
+        e.preventDefault();
+        const map = {
+            '0':'0','1':'1','2':'2','3':'3','4':'4',
+            '5':'5','6':'6','7':'7','8':'8','9':'9',
+            '.':'.', '+':'+', '-':'−', '*':'×', '/':'÷', '%':'%'
+        };
+        if (map[e.key])          appendValue(map[e.key]);
+        else if (e.key === 'Backspace') deleteLast();
+        else if (e.key === 'Enter' || e.key === '=') calculate();
+        else if (e.key === 'Escape') clearAll();
+    });
+});
 
 
 // 2. Вспомогательная функция для заголовков (Теперь с Bearer токеном)
@@ -518,50 +565,4 @@ function flashDisplay() {
     });
 }
 
-function createRipple(e) {
-    const btn = e.currentTarget;
-    const rect = btn.getBoundingClientRect();
 
-    // Координаты касания внутри кнопки
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left - 30;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top  - 30;
-
-    const wave = document.createElement('span');
-    wave.classList.add('ripple-wave');
-    wave.style.left = x + 'px';
-    wave.style.top  = y + 'px';
-
-    btn.appendChild(wave);
-    wave.addEventListener('animationend', () => wave.remove());
-}
-
-// Обновляем кнопку в шапке при старте
-document.addEventListener('DOMContentLoaded', () => {
-    display = document.getElementById('display');
-    historyDiv = document.getElementById('history');
-    historyModal = document.getElementById('historyModal');
-    modalHistoryList = document.getElementById('modalHistoryList');
-    document.querySelectorAll('.btn-number, .btn-action, .btn-operator, .btn-equal')
-    .forEach(btn => {
-        btn.addEventListener('touchstart', createRipple, { passive: true });
-        btn.addEventListener('mousedown',  createRipple);
-    });
-    updateAuthButton();
-    loadHistory();
-
-    display.addEventListener('paste', e => e.preventDefault());
-
-    // Поддержка физической клавиатуры (десктоп)
-    display.addEventListener('keydown', e => {
-        e.preventDefault();
-        const map = {
-            '0':'0','1':'1','2':'2','3':'3','4':'4',
-            '5':'5','6':'6','7':'7','8':'8','9':'9',
-            '.':'.', '+':'+', '-':'−', '*':'×', '/':'÷', '%':'%'
-        };
-        if (map[e.key])          appendValue(map[e.key]);
-        else if (e.key === 'Backspace') deleteLast();
-        else if (e.key === 'Enter' || e.key === '=') calculate();
-        else if (e.key === 'Escape') clearAll();
-    });
-});
