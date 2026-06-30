@@ -7,7 +7,6 @@
     /* Розовая палитра — от тёмного к светлому */
     --pink-dark:        #880e4f;   /* текст на светлых кнопках */
     --pink-deep:        #d81b60;   /* логотип, заголовки модалок */
-    --pink-main:        #e91e63;   /* каретка, база для теней */
     --pink-accent:      #ec407a;   /* кнопки операторов, иконка истории */
     --pink-soft:        #f48fb1;   /* кнопки действий, скроллбар, дата истории */
     --pink-light:       #f6c9d8;   /* кнопки цифр, рамки, разделители */
@@ -275,7 +274,7 @@ html, body {
     white-space: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
-    caret-color: var(--pink-main);
+    caret-color: var(--pink-deep);
     outline: none;
     user-select: text;
     -webkit-user-select: text;
