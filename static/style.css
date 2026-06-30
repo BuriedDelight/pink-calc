@@ -223,7 +223,7 @@ html, body {
     flex: 1;
     overflow-y: auto;
     text-align: right;
-    color: var(--pink-accent:);
+    color: var(--pink-accent);
     font-size: 1rem;
     padding-bottom: 0;
     scrollbar-width: none;
@@ -375,7 +375,7 @@ button.pressed {
 
 /* ─── Кнопка авторизации ────────────────────────────────────────────────────── */
 .auth-toggle-btn {
-    background: var(--pink-accent:);
+    background: var(--pink-accent);
     color: white;
     border: none;
     padding: 8px 24px;
@@ -416,8 +416,8 @@ button.pressed {
 }
 
 .auth-tabs button.active {
-    border-bottom: 3px solid var(--pink-accent:);
-    color: var(--pink-accent:);
+    border-bottom: 3px solid var(--pink-accent);
+    color: var(--pink-accent);
     font-weight: 600;
 }
 
@@ -436,13 +436,13 @@ button.pressed {
 }
 
 .auth-form input:focus {
-    border-color: var(--pink-accent:);
+    border-color: var(--pink-accent);
 }
 
 .auth-form button {
     width: 100%;
     padding: 15px;
-    background: var(--pink-accent:);
+    background: var(--pink-accent);
     color: white;
     border: none;
     aspect-ratio: auto;
