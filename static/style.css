@@ -317,7 +317,8 @@ button {
 .btn-operator .ripple-wave { background: rgba(255, 255, 255, 0.318);  }
 .btn-equal    .ripple-wave { background: rgba(255, 255, 255, 0.486);  }
 
-button:active {
+button:active,
+button.pressed {
     filter: brightness(0.9);
     transform: scale(0.88);
 }

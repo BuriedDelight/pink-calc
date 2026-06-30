@@ -20,6 +20,9 @@ function createRipple(e) {
 
     btn.appendChild(wave);
     wave.addEventListener('animationend', () => wave.remove());
+
+    btn.classList.add('pressed');
+    setTimeout(() => btn.classList.remove('pressed'), 150);
 }
 
 // Обновляем кнопку в шапке при старте
