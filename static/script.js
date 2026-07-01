@@ -1,3 +1,4 @@
+let storedCursorPos = null;
 // 1. Инициализация Токена
 let jwtToken = localStorage.getItem('calc_jwt_token');
 
@@ -256,26 +257,26 @@ function clearAll() {
 function clearDisplay() {
     display.innerText = '0';
     errorState = false;
+    storedCursorPos = null;
     moveCursorToEnd();
 }
 
 function deleteLast() {
     if (errorState) return clearDisplay();
 
-    const rawPos = getRawCursorPos();
+    let rawPos = getRawCursorPos();
+    if (rawPos === null) rawPos = storedCursorPos;
+
     let current = display.innerText.replace(/[\s\u00A0]/g, '');
 
     let newRawPos;
     if (rawPos === null || rawPos >= current.length) {
-        // курсор в конце — удаляем последний символ
         current = current.slice(0, -1);
         newRawPos = current.length;
     } else if (rawPos > 0) {
-        // удаляем символ перед курсором
         current = current.slice(0, rawPos - 1) + current.slice(rawPos);
         newRawPos = rawPos - 1;
     } else {
-        // курсор в самом начале — нечего удалять
         newRawPos = 0;
     }
 
@@ -287,18 +288,21 @@ function deleteLast() {
     }
 
     setRawCursorPos(newRawPos);
+    storedCursorPos = newRawPos; // сохраняем
 }
 
 function appendValue(value) {
     if (errorState) clearDisplay();
 
-    const rawPos = getRawCursorPos();
+    // Пробуем прочитать позицию из selection, иначе берём сохранённую
+    let rawPos = getRawCursorPos();
+    if (rawPos === null) rawPos = storedCursorPos; // null = конец строки
+
     let current = display.innerText.replace(/[\s\u00A0]/g, '');
 
     let newRawPos;
 
     if (rawPos === null || rawPos >= current.length) {
-        // курсор в конце (или не определён)
         if (current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
             current = value;
         } else {
@@ -306,7 +310,6 @@ function appendValue(value) {
         }
         newRawPos = current.length;
     } else {
-        // вставляем в позицию курсора
         const before = current.slice(0, rawPos);
         const after  = current.slice(rawPos);
         if (before === '' && current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
@@ -319,6 +322,7 @@ function appendValue(value) {
 
     display.innerText = formatWithSpaces(current);
     setRawCursorPos(newRawPos);
+    storedCursorPos = newRawPos; // сохраняем актуальную позицию
     flashDisplay();
 
     if (newRawPos >= current.length) display.scrollLeft = display.scrollWidth;
@@ -548,6 +552,7 @@ function setRawCursorPos(rawPos) {
 
 // Курсор в конец строки
 function moveCursorToEnd() {
+    storedCursorPos = null;
     try {
         const range = document.createRange();
         const sel = window.getSelection();
