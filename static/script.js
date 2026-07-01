@@ -394,8 +394,8 @@ function calculate() {
         let formattedResult = formatWithSpaces(result.toString());
         addHistoryItem(textForScreen, formattedResult); 
         display.innerText = formattedResult;
+        moveCursorToEnd();
     } catch (e) {
-        // ДОБАВЬ ЭТУ СТРОКУ, ЧТОБЫ УВИДЕТЬ ПРИЧИНУ В КОНСОЛИ (F12)
         console.error("DEBUG CALCULATOR ERROR:", e.message); 
         
         display.innerText = 'Ошибка'; 
