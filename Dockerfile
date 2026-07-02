@@ -1,9 +1,13 @@
-# Этап 1: Сборка
 FROM golang:alpine AS builder
 WORKDIR /app
-COPY go.mod ./
+
+# Копируем ТОЛЬКО файлы зависимостей
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
+
+# Теперь копируем остальной код
 COPY . .
-RUN go mod tidy 
+
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o calculator .
 
 # Этап 2: Запуск (т.к. голанг огромный)

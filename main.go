@@ -18,7 +18,7 @@ import (
 var db *sql.DB
 
 // Секретный ключ для подписи токенов (в идеале тоже вынести в .env)
-var jwtKey = []byte("super_secret_barbie_key_2026")
+var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 // Структуры данных
 type CalcEntry struct {
@@ -214,7 +214,9 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusCreated)
 
-	} else if r.Method == http.MethodGet {
+	} 
+	else if r.Method == http.MethodGet 
+	{
 		rows, err := db.Query(`
 			SELECT expression, result, created_at FROM (
 				SELECT expression, result, created_at
@@ -244,5 +246,8 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(history)
+	}
+	else {
+    http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
 }

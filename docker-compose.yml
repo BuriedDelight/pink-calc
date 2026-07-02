@@ -8,6 +8,11 @@ services:
       - .env # Говорим Докеру брать пароли отсюда
     volumes:
       - db_data:/var/lib/postgresql/data # Место, где физически лежат файлы БД
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # 2. Go-приложение
   app:
@@ -19,7 +24,8 @@ services:
     env_file:
       - .env # Приложение тоже должно знать логин/пароль для подключения
     depends_on:
-      - db # Запускать приложение только после старта базы
+      db:
+        condition: service_healthy
 
 volumes:
   # Объявляем "постоянный диск" для базы данных
