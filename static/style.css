@@ -316,7 +316,7 @@ button {
 button:active,
 button.pressed {
     filter: brightness(0.9);
-    transform: scale(1.3);
+    transform: scale(1.15);
 }
 
 /* ─── Ripple-эффект ─────────────────────────────────────────────────────────── */
