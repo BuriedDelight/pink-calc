@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var db *sql.DB
@@ -214,9 +214,7 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusCreated)
 
-	} 
-	else if r.Method == http.MethodGet 
-	{
+	} else if r.Method == http.MethodGet { // <-- else if на той же строке, что и }
 		rows, err := db.Query(`
 			SELECT expression, result, created_at FROM (
 				SELECT expression, result, created_at
@@ -246,8 +244,8 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(history)
-	}
-	else {
-    http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+
+	} else { // <-- else на той же строке, что и }
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
 }
