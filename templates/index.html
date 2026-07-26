@@ -13,14 +13,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BarbieCalc">
     <link rel="apple-touch-icon" href="/static/icon.png">
-    <meta name="theme-color" content="#fce4ec">
-    <meta name="color-scheme" content="light">
+    <meta name="theme-color" id="metaThemeColor" content="#fce4ec">
+    <meta name="color-scheme" id="metaColorScheme" content="light">
 </head>
 <body>
     <div class="calculator">
         <div class="header-container">
-            <div class="logo">BarbieCalc</div>
-            
+            <div class="header-left">
+                <div class="logo">BarbieCalc</div>
+                <button class="btn-settings" id="settingsBtn" onclick="toggleSettingsModal()" aria-label="Настройки">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+                    </svg>
+                </button>
+            </div>
             <div class="header-actions">
                 <button id="authBtn" onclick="toggleAuthModal()" class="auth-toggle-btn">Войти</button>
                 <button class="btn-history-icon" onclick="toggleModal()">
@@ -98,6 +105,20 @@
                 </div>
 
                 <button class="close-auth" onclick="toggleAuthModal()">Отмена</button>
+            </div>
+        </div>
+
+        <div id="settingsModal" class="modal-overlay">
+            <div class="modal-body settings-modal-body">
+                <div class="settings-title">Настройки</div>
+                <div class="settings-item">
+                    <span class="settings-label">Тёмная тема</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="themeToggle" onchange="toggleTheme(this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <button class="close-settings" onclick="toggleSettingsModal()">Закрыть</button>
             </div>
         </div>
     </div>

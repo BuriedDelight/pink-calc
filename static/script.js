@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateAuthButton();
     loadHistory();
+    applyTheme(localStorage.getItem('calc_theme') === 'dark');
 });
 
 // ─── Хелперы курсора ─────────────────────────────────────────────────────────
@@ -457,6 +458,40 @@ function loginUser() {
         }
     })
     .catch(err => errDiv.innerText = err.message);
+}
+
+// ─── Настройки и тема ─────────────────────────────────────────────────────────
+const settingsModal = document.getElementById('settingsModal');
+
+function toggleSettingsModal() {
+    if (settingsModal.classList.contains('active')) {
+        settingsModal.classList.remove('active');
+    } else {
+        settingsModal.classList.add('active');
+    }
+}
+
+function toggleTheme(isDark) {
+    applyTheme(isDark);
+    localStorage.setItem('calc_theme', isDark ? 'dark' : 'light');
+}
+
+function applyTheme(isDark) {
+    const root = document.documentElement;
+    if (isDark) {
+        root.classList.add('dark-theme');
+    } else {
+        root.classList.remove('dark-theme');
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) themeToggle.checked = isDark;
+
+    const metaTheme = document.getElementById('metaThemeColor');
+    if (metaTheme) metaTheme.content = isDark ? '#1a1a2e' : '#fce4ec';
+
+    const metaScheme = document.getElementById('metaColorScheme');
+    if (metaScheme) metaScheme.content = isDark ? 'dark' : 'light';
 }
 
 // ─── Утилиты ─────────────────────────────────────────────────────────────────
