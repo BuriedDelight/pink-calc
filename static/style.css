@@ -25,27 +25,40 @@
     --shadow-pulse:     rgba(194, 24,  91,  0.35);
 }
 
-/* ─── Тёмная тема ──────────────────────────────────────────────────────────── */
+/* ─── Тёмная тема (iOS calculator style) ────────────────────────────────────── */
 .dark-theme {
-    --bg-body:          #0d0d1a;
-    --bg-calc:          #1a1a2e;
-    --bg-modal:         rgba(20, 20, 40, 0.97);
+    --bg-body:          #000;
+    --bg-calc:          #000;
+    --bg-modal:         rgba(28, 28, 30, 0.97);
 
-    --pink-dark:        #e8b4c8;
-    --pink-deep:        #f48fb1;
-    --pink-accent:      #ec407a;
-    --pink-soft:        #c2185b;
-    --pink-light:       #3a1a2e;
+    --pink-dark:        #fff;
+    --pink-deep:        #fff;
+    --pink-accent:      #FF9500;
+    --pink-soft:        #A5A5A5;
+    --pink-light:       #333;
 
-    --text-input:       #e0e0e0;
-    --text-muted:       #999;
-    --text-inactive:    #666;
-    --color-error:      #ef5350;
+    --text-input:       #fff;
+    --text-muted:       #8e8e93;
+    --text-inactive:    #555;
+    --color-error:      #FF453A;
 
-    --shadow-calc:      rgba(0, 0, 0, 0.6);
-    --shadow-modal:     rgba(0, 0, 0, 0.5);
-    --shadow-btn:       rgba(0, 0, 0, 0.5);
-    --shadow-pulse:     rgba(236, 64, 122, 0.5);
+    --shadow-calc:      rgba(0, 0, 0, 0.8);
+    --shadow-modal:     rgba(0, 0, 0, 0.6);
+    --shadow-btn:       rgba(0, 0, 0, 0.6);
+    --shadow-pulse:     rgba(255, 149, 0, 0.5);
+}
+
+.dark-theme .btn-action {
+    color: #000;
+}
+
+.dark-theme .auth-form input {
+    background: #1c1c1e;
+    color: #fff;
+}
+
+.dark-theme .modal-overlay::before {
+    background-color: #555;
 }
 
 /* ─── Базовые стили ─────────────────────────────────────────────────────────── */
@@ -319,8 +332,18 @@ html, body {
     100% { transform: scale(1);    text-shadow: none; }
 }
 
+@keyframes resultPop {
+    0%   { transform: scale(0.85); opacity: 0.4; }
+    50%  { transform: scale(1.12); opacity: 1;   text-shadow: 0 0 30px var(--shadow-pulse); }
+    100% { transform: scale(1);    opacity: 1;   text-shadow: none; }
+}
+
 .display.input-flash {
     animation: displayPulse 0.18s ease-out forwards;
+}
+
+.display.result-flash {
+    animation: resultPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .display {

@@ -280,6 +280,11 @@ function calculate() {
         addHistoryItem(textForScreen, formattedResult);
         display.innerText = formattedResult;
 
+        // Анимация результата
+        display.classList.remove('result-flash');
+        void display.offsetWidth;
+        display.classList.add('result-flash');
+
         // Курсор в конец и сбрасываем storedCursorPos
         storedCursorPos = null;
         moveCursorToEnd();
