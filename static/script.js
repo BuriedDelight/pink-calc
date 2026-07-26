@@ -520,6 +520,17 @@ function formatWithSpaces(str) {
     });
 }
 
+// ─── Скрыть адресную строку на iOS ──────────────────────────────────────────
+(function hideAddressBar() {
+    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        const scroll = () => {
+            if (window.scrollY === 0) window.scrollTo(0, 1);
+        };
+        window.addEventListener('load', () => setTimeout(scroll, 300));
+        document.addEventListener('touchstart', scroll, { once: true });
+    }
+})();
+
 // ─── Service Worker ───────────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

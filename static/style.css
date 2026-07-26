@@ -62,21 +62,23 @@
 }
 
 /* ─── Базовые стили ─────────────────────────────────────────────────────────── */
-html, body {
+html {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+body {
     margin: 0;
     padding: 0;
     background-color: var(--bg-body);
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 100dvh;
+    overflow: hidden;
     font-family: 'Fredoka', sans-serif;
     touch-action: manipulation;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
 }
 
 /* ─── Калькулятор ───────────────────────────────────────────────────────────── */
@@ -84,7 +86,7 @@ html, body {
     width: 100%;
     max-width: 400px;
     background-color: var(--bg-calc);
-    height: 100%;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 10px 40px var(--shadow-calc);
@@ -392,6 +394,7 @@ button {
     transition: transform 0.08s ease, filter 0.08s ease;
     position: relative;
     overflow: hidden;
+    touch-action: none;
 }
 
 button:active,
