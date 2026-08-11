@@ -214,6 +214,10 @@ function appendValue(value) {
     let rawPos = getRawCursorPos() ?? storedCursorPos; // null = конец строки
 
     let current = display.innerText.replace(/[\s\u00A0]/g, '');
+
+    // Ограничение на максимальную длину ввода
+    if (current.length >= 35 && value !== '.') return;
+
     let newRawPos;
 
     if (rawPos === null || rawPos >= current.length) {
@@ -242,37 +246,128 @@ function appendValue(value) {
     if (newRawPos >= current.length) display.scrollLeft = display.scrollWidth;
 }
 
+// ─── Безопасное вычисление математического выражения ───────────────────────
+function safeEvaluate(str) {
+    let clean = str.replace(/[\s\u00A0]/g, '')
+                   .replace(/×/g, '*')
+                   .replace(/÷/g, '/')
+                   .replace(/−/g, '-');
+
+    if (!clean || /^[*/%]/.test(clean)) throw new Error("Syntax Error");
+
+    clean = clean.replace(/(\d|\)|%)\s*\(/g, '$1*(');
+    clean = clean.replace(/\)\s*(\d|\()/g, ')*$1');
+
+    clean = clean.replace(/(\d+(?:\.\d+)?)\s*([+\-])\s*(\d+(?:\.\d+)?)%/g, (match, base, op, pct) => {
+        const baseNum = parseFloat(base);
+        const pctNum = parseFloat(pct);
+        const val = (baseNum * pctNum) / 100;
+        return `${baseNum}${op}${val}`;
+    });
+
+    clean = clean.replace(/(\d+(?:\.\d+)?)%/g, (match, pct) => {
+        return (parseFloat(pct) / 100).toString();
+    });
+
+    const tokens = [];
+    let i = 0;
+    while (i < clean.length) {
+        const ch = clean[i];
+        if ('+-*/()'.includes(ch)) {
+            if ((ch === '-' || ch === '+') && (i === 0 || '+-*/('.includes(clean[i - 1]))) {
+                let numStr = ch;
+                i++;
+                while (i < clean.length && /[\d.]/.test(clean[i])) {
+                    numStr += clean[i];
+                    i++;
+                }
+                if (numStr === '-' || numStr === '+') throw new Error("Syntax Error");
+                tokens.push(parseFloat(numStr));
+            } else {
+                tokens.push(ch);
+                i++;
+            }
+        } else if (/[\d.]/.test(ch)) {
+            let numStr = '';
+            while (i < clean.length && /[\d.]/.test(clean[i])) {
+                numStr += clean[i];
+                i++;
+            }
+            const num = parseFloat(numStr);
+            if (isNaN(num)) throw new Error("Syntax Error");
+            tokens.push(num);
+        } else {
+            throw new Error("Syntax Error");
+        }
+    }
+
+    const outputQueue = [];
+    const operatorStack = [];
+    const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
+
+    for (let token of tokens) {
+        if (typeof token === 'number') {
+            outputQueue.push(token);
+        } else if ('+-*/'.includes(token)) {
+            while (
+                operatorStack.length > 0 &&
+                operatorStack[operatorStack.length - 1] !== '(' &&
+                precedence[operatorStack[operatorStack.length - 1]] >= precedence[token]
+            ) {
+                outputQueue.push(operatorStack.pop());
+            }
+            operatorStack.push(token);
+        } else if (token === '(') {
+            operatorStack.push(token);
+        } else if (token === ')') {
+            while (operatorStack.length > 0 && operatorStack[operatorStack.length - 1] !== '(') {
+                outputQueue.push(operatorStack.pop());
+            }
+            if (operatorStack.length === 0) throw new Error("Syntax Error");
+            operatorStack.pop();
+        }
+    }
+
+    while (operatorStack.length > 0) {
+        const op = operatorStack.pop();
+        if (op === '(' || op === ')') throw new Error("Syntax Error");
+        outputQueue.push(op);
+    }
+
+    const evalStack = [];
+    for (let token of outputQueue) {
+        if (typeof token === 'number') {
+            evalStack.push(token);
+        } else {
+            if (evalStack.length < 2) throw new Error("Syntax Error");
+            const b = evalStack.pop();
+            const a = evalStack.pop();
+            let res;
+            switch (token) {
+                case '+': res = a + b; break;
+                case '-': res = a - b; break;
+                case '*': res = a * b; break;
+                case '/':
+                    if (b === 0) throw new Error("Math Error");
+                    res = a / b;
+                    break;
+            }
+            evalStack.push(res);
+        }
+    }
+
+    if (evalStack.length !== 1) throw new Error("Syntax Error");
+    return evalStack[0];
+}
+
 // ─── Вычисление ──────────────────────────────────────────────────────────────
 function calculate() {
     try {
         const textForScreen = display.innerText;
         const originalText  = display.innerText.replace(/[\s\u00A0]/g, '');
 
-        let expression = originalText
-            .replace(/×/g, '*')
-            .replace(/÷/g, '/')
-            .replace(/−/g, '-');
-
-        // Защита: выражение не должно начинаться с * или /
-        if (/^[*/]/.test(expression)) throw new Error("Syntax Error");
-
-        expression = expression.replace(/(\d|\)|%)\s*\(/g, '$1*(');
-        expression = expression.replace(/\)\s*(\d|\()/g, ')*$1');
-
-        expression = expression.replace(/(.*?)([+\-])(\d+(?:\.\d+)?)%/g, (match, baseExpr, operator, percentVal) => {
-            try {
-                const base = new Function('return ' + baseExpr)();
-                const calculatedPercent = (base * parseFloat(percentVal)) / 100;
-                return baseExpr + operator + calculatedPercent;
-            } catch(e) { return match; }
-        });
-
-        expression = expression.replace(/(\d+(?:\.\d+)?)%/g, (match, percentVal) => {
-            return parseFloat(percentVal) / 100;
-        });
-
-        let result = new Function('return ' + expression)();
-        result = Math.round(result * 100000000) / 100000000;
+        let rawResult = safeEvaluate(originalText);
+        let result = Math.round(rawResult * 100000000) / 100000000;
 
         if (!isFinite(result) || isNaN(result)) throw new Error("Math Error");
 
@@ -313,7 +408,13 @@ function addHistoryItem(expression, result) {
         </div>`;
     scrollToBottom();
 
-    if (!jwtToken) return;
+    if (!jwtToken) {
+        let guestHistory = JSON.parse(localStorage.getItem('calc_guest_history') || '[]');
+        guestHistory.push({ expression: expression.toString(), result: result.toString(), created_at: new Date().toISOString() });
+        if (guestHistory.length > 50) guestHistory = guestHistory.slice(-50);
+        localStorage.setItem('calc_guest_history', JSON.stringify(guestHistory));
+        return;
+    }
 
     fetch('/api/history', {
         method: 'POST',
@@ -332,7 +433,20 @@ function addHistoryItem(expression, result) {
 function loadHistory() {
     historyDiv.innerHTML = '';
     if (!jwtToken) {
-        historyDiv.innerHTML = '<div style="text-align:center;color:#f48fb1;margin-top:20px;">Войдите, чтобы сохранить историю</div>';
+        const guestHistory = JSON.parse(localStorage.getItem('calc_guest_history') || '[]');
+        if (guestHistory.length > 0) {
+            guestHistory.forEach(item => {
+                const dateTimeStr = formatDateTime(item.created_at);
+                historyDiv.innerHTML += `
+                    <div class="history-item">
+                        <div class="history-date">${dateTimeStr}</div>
+                        <div class="history-math">${item.expression} = ${item.result}</div>
+                    </div>`;
+            });
+            scrollToBottom();
+        } else {
+            historyDiv.innerHTML = '<div style="text-align:center;color:#f48fb1;margin-top:20px;">История пуста (гостевой режим)</div>';
+        }
         return;
     }
 
@@ -357,6 +471,24 @@ function loadHistory() {
             }
         })
         .catch(err => console.error("Ошибка загрузки истории:", err));
+}
+
+function syncGuestHistory() {
+    const guestHistory = JSON.parse(localStorage.getItem('calc_guest_history') || '[]');
+    if (!guestHistory.length || !jwtToken) return;
+
+    const promises = guestHistory.map(item =>
+        fetch('/api/history', {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ expression: item.expression, result: item.result })
+        })
+    );
+
+    Promise.all(promises).then(() => {
+        localStorage.removeItem('calc_guest_history');
+        loadHistory();
+    }).catch(err => console.error("Ошибка синхронизации истории:", err));
 }
 
 function toggleModal() {
@@ -459,6 +591,7 @@ function loginUser() {
             localStorage.setItem('calc_jwt_token', jwtToken);
             authModal.classList.remove('active');
             updateAuthButton();
+            syncGuestHistory();
             loadHistory();
         }
     })

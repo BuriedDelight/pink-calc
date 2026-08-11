@@ -1,5 +1,7 @@
 # Игнорируем бинарник Go
 calculator
+pink-calc
+*.exe
 
 # Игнорируем временные файлы Docker и логи
 *.log

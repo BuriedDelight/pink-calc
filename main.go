@@ -16,9 +16,7 @@ import (
 )
 
 var db *sql.DB
-
-// Секретный ключ для подписи токенов (в идеале тоже вынести в .env)
-var jwtKey = []byte(os.Getenv("JWT_SECRET"))
+var jwtKey []byte
 
 // Структуры данных
 type CalcEntry struct {
@@ -38,6 +36,7 @@ type Claims struct {
 }
 
 func main() {
+	initJWTKey()
 	initDB()
 	defer db.Close()
 
@@ -62,10 +61,19 @@ func main() {
 	// API маршруты
 	http.HandleFunc("/api/register", registerHandler)
 	http.HandleFunc("/api/login", loginHandler)
-	http.HandleFunc("/api/history", historyHandler)
+	http.HandleFunc("/api/history", authMiddleware(historyHandler))
 
 	fmt.Println("Сервер запущен на порту 8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func initJWTKey() {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		log.Println("ВНИМАНИЕ: JWT_SECRET не задан в переменных окружения. Используется дефолтный секретный ключ.")
+		secret = "barbie_calc_default_secret_key_change_in_prod"
+	}
+	jwtKey = []byte(secret)
 }
 
 func initDB() {
@@ -83,11 +91,40 @@ func initDB() {
 		log.Fatalf("Ошибка драйвера БД: %v", err)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		log.Printf("Внимание: БД пока недоступна: %v\n", err)
-	} else {
-		fmt.Println("Успешное подключение к PostgreSQL!")
+	// Попытки подключения (retry loop)
+	for i := 1; i <= 5; i++ {
+		err = db.Ping()
+		if err == nil {
+			fmt.Println("Успешное подключение к PostgreSQL!")
+			return
+		}
+		log.Printf("Попытка %d/5: БД пока недоступна (%v). Ожидание 2 секунды...", i, err)
+		time.Sleep(2 * time.Second)
+	}
+	log.Println("Предупреждение: Не удалось подключиться к БД после 5 попыток. Сервер запущен без поддержки истории.")
+}
+
+// Middleware для авторизации
+func authMiddleware(next func(http.ResponseWriter, *http.Request, int)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "Отсутствует токен авторизации", http.StatusUnauthorized)
+			return
+		}
+
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		claims := &Claims{}
+		tkn, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return jwtKey, nil
+		})
+
+		if err != nil || !tkn.Valid {
+			http.Error(w, "Недействительный токен", http.StatusUnauthorized)
+			return
+		}
+
+		next(w, r, claims.UserID)
 	}
 }
 
@@ -104,15 +141,28 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	username := strings.TrimSpace(creds.Username)
+	password := creds.Password
+
+	if username == "" || len(password) < 4 {
+		http.Error(w, "Имя пользователя должно быть не пустым, а пароль минимум 4 символа", http.StatusBadRequest)
+		return
+	}
+
+	if len(password) > 72 {
+		http.Error(w, "Пароль слишком длинный (максимум 72 символа)", http.StatusBadRequest)
+		return
+	}
+
 	// Хэшируем пароль
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
 		return
 	}
 
 	// Сохраняем в БД
-	_, err = db.Exec("INSERT INTO users (username, password_hash) VALUES ($1, $2)", creds.Username, string(hashedPassword))
+	_, err = db.Exec("INSERT INTO users (username, password_hash) VALUES ($1, $2)", username, string(hashedPassword))
 	if err != nil {
 		http.Error(w, "Пользователь уже существует или ошибка БД", http.StatusConflict)
 		log.Printf("Ошибка при регистрации: %v", err)
@@ -135,10 +185,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Ищем пользователя
+	username := strings.TrimSpace(creds.Username)
 	var storedHash string
 	var userID int
-	err := db.QueryRow("SELECT id, password_hash FROM users WHERE username=$1", creds.Username).Scan(&userID, &storedHash)
+	err := db.QueryRow("SELECT id, password_hash FROM users WHERE username=$1", username).Scan(&userID, &storedHash)
 	if err != nil {
 		http.Error(w, "Неверный логин или пароль", http.StatusUnauthorized)
 		return
@@ -173,35 +223,17 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// 3. Обновленный обработчик истории
-func historyHandler(w http.ResponseWriter, r *http.Request) {
-	// Достаем токен из заголовка Authorization
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		http.Error(w, "Отсутствует токен", http.StatusUnauthorized)
-		return
-	}
-
-	// Формат заголовка: "Bearer <token>"
-	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
-	claims := &Claims{}
-	tkn, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-
-	if err != nil || !tkn.Valid {
-		http.Error(w, "Недействительный токен", http.StatusUnauthorized)
-		return
-	}
-
-	// Теперь мы точно знаем ID пользователя из токена: claims.UserID
-	userID := claims.UserID
-
+// 3. Обработчик истории
+func historyHandler(w http.ResponseWriter, r *http.Request, userID int) {
 	if r.Method == http.MethodPost {
 		var entry CalcEntry
 		if err := json.NewDecoder(r.Body).Decode(&entry); err != nil {
 			http.Error(w, "Неверный формат данных", http.StatusBadRequest)
+			return
+		}
+
+		if strings.TrimSpace(entry.Expression) == "" || strings.TrimSpace(entry.Result) == "" {
+			http.Error(w, "Пустое выражение или результат", http.StatusBadRequest)
 			return
 		}
 
@@ -214,13 +246,14 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusCreated)
 
-	} else if r.Method == http.MethodGet { // <-- else if на той же строке, что и }
+	} else if r.Method == http.MethodGet {
 		rows, err := db.Query(`
 			SELECT expression, result, created_at FROM (
 				SELECT expression, result, created_at
 				FROM history
 				WHERE user_id = $1
 				ORDER BY created_at DESC
+				LIMIT 100
 			) sub
 			ORDER BY created_at ASC`, userID)
 		if err != nil {
@@ -245,7 +278,7 @@ func historyHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(history)
 
-	} else { // <-- else на той же строке, что и }
+	} else {
 		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
 }
