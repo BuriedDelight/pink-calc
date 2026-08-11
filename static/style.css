@@ -327,6 +327,8 @@ body {
 .history-math {
     word-wrap: break-word;
     word-break: break-all;
+}
+
 .empty-history-msg {
     text-align: center;
     color: var(--pink-soft);
@@ -345,26 +347,11 @@ body {
         transform: scale(1.025);
     }
     45% {
-        caret-color: #ff1744;
+        caret-color: var(--pink-soft);
         transform: scale(1.01);
     }
     100% {
         caret-color: var(--pink-deep);
-        transform: scale(1);
-    }
-}
-
-.dark-theme @keyframes caretFlash {
-    0% {
-        caret-color: #ff9500;
-        transform: scale(1.025);
-    }
-    45% {
-        caret-color: #ffb74d;
-        transform: scale(1.01);
-    }
-    100% {
-        caret-color: #ffffff;
         transform: scale(1);
     }
 }
