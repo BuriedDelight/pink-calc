@@ -327,27 +327,60 @@ body {
 .history-math {
     word-wrap: break-word;
     word-break: break-all;
+.empty-history-msg {
+    text-align: center;
+    color: var(--pink-soft);
+    margin-top: 20px;
+    font-size: 0.95rem;
+}
+
+.dark-theme .empty-history-msg {
+    color: #ffffff !important;
 }
 
 /* ─── Дисплей ───────────────────────────────────────────────────────────────── */
-@keyframes displayPulse {
-    0%   { transform: scale(1);    text-shadow: none; }
-    40%  { transform: scale(1.02); text-shadow: 0 0 18px var(--shadow-pulse); }
-    100% { transform: scale(1);    text-shadow: none; }
+@keyframes caretFlash {
+    0% {
+        caret-color: var(--pink-accent);
+        transform: scale(1.025);
+    }
+    45% {
+        caret-color: #ff1744;
+        transform: scale(1.01);
+    }
+    100% {
+        caret-color: var(--pink-deep);
+        transform: scale(1);
+    }
+}
+
+.dark-theme @keyframes caretFlash {
+    0% {
+        caret-color: #ff9500;
+        transform: scale(1.025);
+    }
+    45% {
+        caret-color: #ffb74d;
+        transform: scale(1.01);
+    }
+    100% {
+        caret-color: #ffffff;
+        transform: scale(1);
+    }
 }
 
 @keyframes resultPop {
-    0%   { transform: scale(0.85); opacity: 0.4; }
-    50%  { transform: scale(1.12); opacity: 1;   text-shadow: 0 0 30px var(--shadow-pulse); }
-    100% { transform: scale(1);    opacity: 1;   text-shadow: none; }
+    0%   { transform: scale(0.94); opacity: 0.8; }
+    50%  { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1);    opacity: 1; }
 }
 
 .display.input-flash {
-    animation: displayPulse 0.18s ease-out forwards;
+    animation: caretFlash 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .display.result-flash {
-    animation: resultPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: resultPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .display {
@@ -363,10 +396,11 @@ body {
     outline: none;
     user-select: text;
     -webkit-user-select: text;
+    transition: caret-color 0.15s ease;
 }
 
 .display::selection {
-    background: rgba(233, 30, 99, 0.2);
+    background: transparent;
 }
 
 .display::-webkit-scrollbar {

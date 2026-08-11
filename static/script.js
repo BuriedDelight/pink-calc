@@ -445,7 +445,7 @@ function loadHistory() {
             });
             scrollToBottom();
         } else {
-            historyDiv.innerHTML = '<div style="text-align:center;color:#f48fb1;margin-top:20px;">История пуста (гостевой режим)</div>';
+            historyDiv.innerHTML = '<div class="empty-history-msg">История пуста (гостевой режим)</div>';
         }
         return;
     }
@@ -467,7 +467,7 @@ function loadHistory() {
                 });
                 scrollToBottom();
             } else {
-                historyDiv.innerHTML = '<div style="text-align:center;color:#f48fb1;margin-top:20px;">История пуста</div>';
+                historyDiv.innerHTML = '<div class="empty-history-msg">История пуста</div>';
             }
         })
         .catch(err => console.error("Ошибка загрузки истории:", err));
@@ -496,7 +496,7 @@ function toggleModal() {
         historyModal.classList.remove('active');
     } else {
         modalHistoryList.innerHTML = historyDiv.innerHTML ||
-            '<div style="text-align:center;color:#f48fb1;margin-top:20px;">История пуста</div>';
+            '<div class="empty-history-msg">История пуста</div>';
         historyModal.classList.add('active');
         modalHistoryList.scrollTop = modalHistoryList.scrollHeight;
     }
