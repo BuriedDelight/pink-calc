@@ -340,20 +340,26 @@ body {
     color: #ffffff !important;
 }
 
-/* ─── Дисплей ───────────────────────────────────────────────────────────────── */
-@keyframes caretFlash {
-    0% {
-        caret-color: var(--pink-accent);
-        transform: scale(1.025);
-    }
-    45% {
-        caret-color: var(--pink-soft);
-        transform: scale(1.01);
-    }
-    100% {
-        caret-color: var(--pink-deep);
-        transform: scale(1);
-    }
+/* ─── Дисплей и Кастомная Каретка ───────────────────────────────────────────── */
+.calc-caret {
+    display: inline-block;
+    width: 3px;
+    height: 1.05em;
+    background-color: var(--pink-deep);
+    margin: 0 1px;
+    vertical-align: -0.12em;
+    border-radius: 2px;
+    animation: caretBlink 1.06s infinite;
+}
+
+.dark-theme .calc-caret {
+    background-color: #ffffff;
+}
+
+@keyframes caretBlink {
+    0%, 45% { opacity: 1; }
+    50%, 95% { opacity: 0; }
+    100% { opacity: 1; }
 }
 
 @keyframes resultPop {
@@ -362,8 +368,24 @@ body {
     100% { transform: scale(1);    opacity: 1; }
 }
 
-.display.input-flash {
-    animation: caretFlash 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+.display.input-flash .calc-caret {
+    animation: caretPulse 0.22s ease-out;
+}
+
+@keyframes caretPulse {
+    0% { transform: scaleY(1.4); background-color: var(--pink-accent); }
+    50% { transform: scaleY(1.2); }
+    100% { transform: scaleY(1); }
+}
+
+.dark-theme .display.input-flash .calc-caret {
+    animation: caretPulseDark 0.22s ease-out;
+}
+
+@keyframes caretPulseDark {
+    0% { transform: scaleY(1.4); background-color: #ff9500; }
+    50% { transform: scaleY(1.2); }
+    100% { transform: scaleY(1); background-color: #ffffff; }
 }
 
 .display.result-flash {
@@ -379,15 +401,10 @@ body {
     white-space: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
-    caret-color: var(--pink-deep);
     outline: none;
-    user-select: text;
-    -webkit-user-select: text;
-    transition: caret-color 0.15s ease;
-}
-
-.display::selection {
-    background: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: text;
 }
 
 .display::-webkit-scrollbar {

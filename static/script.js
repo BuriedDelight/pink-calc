@@ -1,5 +1,6 @@
 // ─── Глобальные переменные ───────────────────────────────────────────────────
 let storedCursorPos = null;
+let currentRawText = '0';
 let jwtToken = localStorage.getItem('calc_jwt_token');
 let display, historyDiv, historyModal, modalHistoryList;
 let errorState = false;
@@ -30,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     historyDiv       = document.getElementById('history');
     historyModal     = document.getElementById('historyModal');
     modalHistoryList = document.getElementById('modalHistoryList');
+
+    renderDisplay();
 
     // Ripple на всех кнопках калькулятора
     document.querySelectorAll('.btn-number, .btn-action, .btn-operator, .btn-equal')
@@ -67,12 +70,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Запрет вставки в display
-    display.addEventListener('paste', e => e.preventDefault());
+    // Клик по дисплею для позиционирования курсора
+    display.addEventListener('click', (e) => {
+        const rect = display.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const width = rect.width;
+        if (width > 0) {
+            let ratio = clickX / width;
+            let rawIndex = Math.round(ratio * currentRawText.length);
+            rawIndex = Math.max(0, Math.min(currentRawText.length, rawIndex));
+            storedCursorPos = (rawIndex >= currentRawText.length) ? null : rawIndex;
+        } else {
+            storedCursorPos = null;
+        }
+        renderDisplay();
+    });
 
     // Физическая клавиатура (десктоп)
-    display.addEventListener('keydown', e => {
-        e.preventDefault();
+    window.addEventListener('keydown', e => {
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        if (activeTag === 'input' || activeTag === 'textarea') return;
+
         const map = {
             '0':'0','1':'1','2':'2','3':'3','4':'4',
             '5':'5','6':'6','7':'7','8':'8','9':'9',
@@ -84,78 +102,49 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (e.key === 'Escape')           clearAll();
     });
 
-    // Сохраняем позицию курсора когда пользователь сам тапает по display
-    display.addEventListener('click', () => {
-        storedCursorPos = getRawCursorPos();
-    });
-
     updateAuthButton();
     loadHistory();
     applyTheme(localStorage.getItem('calc_theme') === 'dark');
 });
 
-// ─── Хелперы курсора ─────────────────────────────────────────────────────────
+// ─── Рендеринг дисплея с кастомной кареткой ────────────────────────────────
+function renderDisplay() {
+    if (!display) return;
 
-// Возвращает позицию в «сырой» строке (без NBSP).
-// Возвращает null если display не активен — значит «конец строки»
-function getRawCursorPos() {
-    // Ключевое исправление: если display не в фокусе — возвращаем null
-    if (document.activeElement !== display) return null;
-
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return null;
-    const range = sel.getRangeAt(0);
-    if (!display.contains(range.startContainer)) return null;
-
-    const formattedPos = range.startOffset;
-    const formatted = display.innerText;
-
-    let rawCount = 0;
-    for (let i = 0; i < formattedPos && i < formatted.length; i++) {
-        if (formatted[i] !== '\u00A0') rawCount++;
-    }
-    return rawCount;
-}
-
-// Ставит курсор на позицию rawPos в сырой строке
-function setRawCursorPos(rawPos) {
-    const formatted = display.innerText;
-    if (!formatted) return;
-
-    let rawCount = 0;
-    let formattedPos = formatted.length;
-
-    for (let i = 0; i < formatted.length; i++) {
-        if (rawCount === rawPos) { formattedPos = i; break; }
-        if (formatted[i] !== '\u00A0') rawCount++;
+    if (errorState) {
+        display.innerHTML = 'Ошибка';
+        return;
     }
 
-    const textNode = display.firstChild;
-    if (!textNode) return;
-    try {
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.setStart(textNode, Math.min(formattedPos, textNode.length));
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-    } catch(e) {}
+    const formatted = formatWithSpaces(currentRawText);
+    const rawPos = storedCursorPos;
+
+    if (rawPos === null || rawPos >= currentRawText.length) {
+        display.innerHTML = escapeHtml(formatted) + '<span class="calc-caret"></span>';
+    } else {
+        let rawCount = 0;
+        let formattedPos = formatted.length;
+        for (let i = 0; i < formatted.length; i++) {
+            if (rawCount === rawPos) { formattedPos = i; break; }
+            if (formatted[i] !== '\u00A0' && formatted[i] !== ' ') rawCount++;
+        }
+
+        const before = formatted.slice(0, formattedPos);
+        const after  = formatted.slice(formattedPos);
+
+        display.innerHTML = escapeHtml(before) + '<span class="calc-caret"></span>' + escapeHtml(after);
+    }
 }
 
-// Курсор в конец строки
-function moveCursorToEnd() {
-    storedCursorPos = null;
-    try {
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.selectNodeContents(display);
-        range.collapse(false);
-        sel.removeAllRanges();
-        sel.addRange(range);
-    } catch(e) {}
+function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#039;");
 }
 
-// Анимация пульса при вводе
+// Анимация каретки при вводе
 function flashDisplay() {
     display.classList.remove('input-flash');
     requestAnimationFrame(() => {
@@ -172,78 +161,62 @@ function clearAll() {
 }
 
 function clearDisplay() {
-    display.innerText = '0';
+    currentRawText = '0';
     errorState = false;
     storedCursorPos = null;
-    moveCursorToEnd();
+    renderDisplay();
 }
 
 function deleteLast() {
     if (errorState) return clearDisplay();
 
-    // getRawCursorPos вернёт null если display не в фокусе → берём storedCursorPos
-    let rawPos = getRawCursorPos() ?? storedCursorPos;
+    let rawPos = storedCursorPos;
 
-    let current = display.innerText.replace(/[\s\u00A0]/g, '');
-    let newRawPos;
-
-    if (rawPos === null || rawPos >= current.length) {
-        current = current.slice(0, -1);
-        newRawPos = current.length;
+    if (rawPos === null || rawPos >= currentRawText.length) {
+        currentRawText = currentRawText.slice(0, -1);
+        storedCursorPos = null;
     } else if (rawPos > 0) {
-        current = current.slice(0, rawPos - 1) + current.slice(rawPos);
-        newRawPos = rawPos - 1;
-    } else {
-        newRawPos = 0;
+        currentRawText = currentRawText.slice(0, rawPos - 1) + currentRawText.slice(rawPos);
+        storedCursorPos = rawPos - 1;
     }
 
-    if (current === '') {
-        display.innerText = '0';
-        newRawPos = 1;
-    } else {
-        display.innerText = formatWithSpaces(current);
+    if (currentRawText === '') {
+        currentRawText = '0';
+        storedCursorPos = null;
     }
 
-    setRawCursorPos(newRawPos);
-    storedCursorPos = newRawPos;
+    renderDisplay();
 }
 
 function appendValue(value) {
     if (errorState) clearDisplay();
 
-    let rawPos = getRawCursorPos() ?? storedCursorPos; // null = конец строки
+    if (currentRawText.length >= 35 && value !== '.') return;
 
-    let current = display.innerText.replace(/[\s\u00A0]/g, '');
+    let rawPos = storedCursorPos;
 
-    // Ограничение на максимальную длину ввода
-    if (current.length >= 35 && value !== '.') return;
-
-    let newRawPos;
-
-    if (rawPos === null || rawPos >= current.length) {
-        if (current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
-            current = value;
+    if (rawPos === null || rawPos >= currentRawText.length) {
+        if (currentRawText === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
+            currentRawText = value;
         } else {
-            current += value;
+            currentRawText += value;
         }
-        newRawPos = current.length;
+        storedCursorPos = null;
     } else {
-        const before = current.slice(0, rawPos);
-        const after  = current.slice(rawPos);
-        if (before === '' && current === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
-            current = value + after;
+        const before = currentRawText.slice(0, rawPos);
+        const after  = currentRawText.slice(rawPos);
+        if (before === '' && currentRawText === '0' && value !== '.' && !['+','−','×','÷','%'].includes(value)) {
+            currentRawText = value + after;
         } else {
-            current = before + value + after;
+            currentRawText = before + value + after;
         }
-        newRawPos = rawPos + value.length;
+        storedCursorPos = rawPos + value.length;
     }
 
-    display.innerText = formatWithSpaces(current);
-    setRawCursorPos(newRawPos);
-    storedCursorPos = newRawPos;
+    renderDisplay();
     flashDisplay();
 
-    if (newRawPos >= current.length) display.scrollLeft = display.scrollWidth;
+    display.scrollLeft = display.scrollWidth;
 }
 
 // ─── Безопасное вычисление математического выражения ───────────────────────
@@ -363,31 +336,29 @@ function safeEvaluate(str) {
 // ─── Вычисление ──────────────────────────────────────────────────────────────
 function calculate() {
     try {
-        const textForScreen = display.innerText;
-        const originalText  = display.innerText.replace(/[\s\u00A0]/g, '');
+        const textForScreen = formatWithSpaces(currentRawText);
 
-        let rawResult = safeEvaluate(originalText);
+        let rawResult = safeEvaluate(currentRawText);
         let result = Math.round(rawResult * 100000000) / 100000000;
 
         if (!isFinite(result) || isNaN(result)) throw new Error("Math Error");
 
-        const formattedResult = formatWithSpaces(result.toString());
+        currentRawText = result.toString();
+        const formattedResult = formatWithSpaces(currentRawText);
         addHistoryItem(textForScreen, formattedResult);
-        display.innerText = formattedResult;
+
+        storedCursorPos = null;
+        renderDisplay();
 
         // Анимация результата
         display.classList.remove('result-flash');
         void display.offsetWidth;
         display.classList.add('result-flash');
 
-        // Курсор в конец и сбрасываем storedCursorPos
-        storedCursorPos = null;
-        moveCursorToEnd();
-
     } catch (e) {
         console.error("Calculator error:", e.message);
-        display.innerText = 'Ошибка';
         errorState = true;
+        renderDisplay();
         setTimeout(clearDisplay, 1500);
     }
     display.scrollLeft = display.scrollWidth;
